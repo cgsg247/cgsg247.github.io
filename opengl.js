@@ -168,8 +168,7 @@ function onStart() {
 
     canvas.onwheel = (ev) => {
         const zoomFactor = 1.1;
-
-        e.preventDefault();
+        
         if (ev.deltaY < 0)
             mouse_wheel *= zoomFactor;
         else
