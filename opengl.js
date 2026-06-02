@@ -7,53 +7,54 @@ function initGL(canvas) {
     gl.viewportHeight = canvas.height;
 }
 
-const shaderFs = `#version 300 es
-        precision highp float;
-        layout (location = 0) out vec4 o_color;
+// const shaderFs = `#version 300 es
+//         precision highp float;
+//         layout (location = 0) out vec4 o_color;
 
-        uniform float u_time;
-        uniform float u_mouse_x;
-        uniform float u_mouse_y;
-        uniform float u_mouse_wheel;
+//         uniform float u_time;
+//         uniform float u_mouse_x;
+//         uniform float u_mouse_y;
+//         uniform float u_mouse_wheel;
+//         uniform vec3 u_fractal_color;
 
-        vec2 cmplMulCmpl( vec2 Z1, vec2 Z2 ) 
-        {
-            vec2 r;
-            
-            r.x = Z1.x * Z2.x - Z1.y * Z2.y;
-            r.y = Z1.x * Z2.y + Z2.x * Z1.y;
-            return r;
-        }
+//         vec2 cmplMulCmpl( vec2 Z1, vec2 Z2 ) 
+//         {
+//             vec2 r;
 
-        void main() {
-            float n = 0.0;
-            float FRAME_W = 800.0, FRAME_H = 800.0;
-            float X1 = 2.0, X0 = -2.0, Y1 = 2.0, Y0 = -2.0;
-        
-            float ys = gl_FragCoord.y;// + u_mouse_y;
-            float xs = gl_FragCoord.x;// - u_mouse_x;
+//             r.x = Z1.x * Z2.x - Z1.y * Z2.y;
+//             r.y = Z1.x * Z2.y + Z2.x * Z1.y;
+//             return r;
+//         }
 
-            vec2 Z = vec2((xs * (X1 - X0) / FRAME_W + X0) / u_mouse_wheel, (ys * (Y1 - Y0) / FRAME_H + Y0) / u_mouse_wheel);
-            Z.x += u_mouse_x;
-            Z.y -= u_mouse_y;
-            vec2 Z0 = Z;
-            
-            while (n < 255.0 && (Z.x * Z.x + Z.y * Z.y) < 4.0)
-            {
-                Z = cmplMulCmpl(Z, Z) + Z0; // + vec2(abs(sin(u_time / 2.0) * 2.0) * 0.5, abs(sin(u_time / 3.0) * 3.0) * 2.0 + 0.5);
-                n++;
-            }
-            o_color = vec4(n * 0.03, n * 0.1, n * 0.01, 1);
-        }`;
+//         void main() {
+//             float n = 0.0;
+//             float FRAME_W = 800.0, FRAME_H = 800.0;
+//             float X1 = 2.0, X0 = -2.0, Y1 = 2.0, Y0 = -2.0;
 
-const shaderVs = `#version 300 es
-        precision highp float;
+//             float ys = gl_FragCoord.y;// + u_mouse_y;
+//             float xs = gl_FragCoord.x;// - u_mouse_x;
 
-        layout (location = 0) in vec2 a_pos;
+//             vec2 Z = vec2((xs * (X1 - X0) / FRAME_W + X0) / u_mouse_wheel, (ys * (Y1 - Y0) / FRAME_H + Y0) / u_mouse_wheel);
+//             Z.x += u_mouse_x;
+//             Z.y -= u_mouse_y;
+//             vec2 Z0 = Z;
 
-        void main() {
-            gl_Position = vec4(a_pos, 0, 1);
-        }`;
+//             while (n < 255.0 && (Z.x * Z.x + Z.y * Z.y) < 4.0)
+//             {
+//                 Z = cmplMulCmpl(Z, Z) + Z0; // + vec2(abs(sin(u_time / 2.0) * 2.0) * 0.5, abs(sin(u_time / 3.0) * 3.0) * 2.0 + 0.5);
+//                 n++;
+//             }
+//             o_color = vec4(vec3(n * u_fractal_color.x, n * u_fractal_color.y, n * u_fractal_color.z), 1);
+//         }`;
+
+// const shaderVs = `#version 300 es
+//         precision highp float;
+
+//         layout (location = 0) in vec2 a_pos;
+
+//         void main() {
+//             gl_Position = vec4(a_pos, 0, 1);
+//         }`;
 
 function getShader(shaderStr, type) {
     const shader = gl.createShader(type);
@@ -78,13 +79,24 @@ let u_time_location;
 let u_mouse_x;
 let u_mouse_y;
 let u_mouse_wheel;
+let u_fractal_color;
 
 let FRAME_W = 800.0, FRAME_H = 800.0;
 
-function initShaders() {
+function loadShaderText(url) {
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw "Resource not found";
+            }
+            return response.text();
+        });
+}
 
-    const vs = getShader(shaderFs, gl.FRAGMENT_SHADER);
-    const fs = getShader(shaderVs, gl.VERTEX_SHADER);
+function initShaders(shaderFs, shaderVs) {
+
+    const fs = getShader(shaderFs, gl.FRAGMENT_SHADER);
+    const vs = getShader(shaderVs, gl.VERTEX_SHADER);
 
     const program = gl.createProgram();
     gl.attachShader(program, vs);
@@ -101,6 +113,7 @@ function initShaders() {
     u_mouse_x = gl.getUniformLocation(program, "u_mouse_x");
     u_mouse_y = gl.getUniformLocation(program, "u_mouse_y");
     u_mouse_wheel = gl.getUniformLocation(program, "u_mouse_wheel");
+    u_fractal_color = gl.getUniformLocation(program, "u_fractal_color");
 }
 
 let vertexBuffer;
@@ -128,6 +141,7 @@ function drawScene() {
     gl.uniform1f(u_mouse_x, mouseX);
     gl.uniform1f(u_mouse_y, mouseY);
     gl.uniform1f(u_mouse_wheel, mouse_wheel);
+    gl.uniform3f(u_fractal_color, window.fractalColors.color.r / 255.0, window.fractalColors.color.g / 255.0, window.fractalColors.color.b / 255.0);
 
     gl.drawArrays(gl.TRIANGLES, 0, 3);
     window.requestAnimationFrame(drawScene);
@@ -168,7 +182,7 @@ function onStart() {
 
     canvas.onwheel = (ev) => {
         const zoomFactor = 1.1;
-        
+
         if (ev.deltaY < 0)
             mouse_wheel *= zoomFactor;
         else
@@ -178,9 +192,20 @@ function onStart() {
     };
 
     initGL(canvas);
-    initShaders();
+    //initShaders();
     initBuffer();
 
-    startTime = new Date().getMilliseconds();
-    drawScene();
+    Promise.all([
+        loadShaderText("mandl.vert"),
+        loadShaderText("mandl.frag")
+    ])
+        .then(([shaderVs, shaderFs]) => {
+            initShaders(shaderFs, shaderVs);
+            startTime = new Date().getMilliseconds();
+            drawScene();
+            console.log("Shaders loaded");
+        })
+        .catch(error => {
+            console.error("Error:", error);
+        });
 }
