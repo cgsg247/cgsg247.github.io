@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        :root {
+            --tp-base-font-size: 32px;
+            --tp-container-unit-size: 56px;
+
+            --tp-label-foreground-color: #ffffff;
+            --tp-button-foreground-color: #ffffff;
+        }
+
+        .tp-dfwv {
+            width: 560px !important;
+            font-size: 20px !important;
+            font-weight: 800 !important;
+        }
+
+        .tp-lblv_l {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+            width: 180px !important;
+        }
+
+        .tp-btnv_t,
+        .tp-txtv_i {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+        }
+    </style>
+
+    <script src="opengl.js"></script>
+</head>
+
+<body onload="onStart();">
+    <h2><a href="/index.html">menu</a></h2>
+    <canvas id="webgl-canvas" style="border: none;" width="800" height="800"></canvas>
+    <script type="module">
+
+        import { Pane } from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.5/+esm';
+
+        const pane = new Pane({
+            title: 'Fractal Control',
+        });
+
+        window.fractalColors = {
+            color: {
+                r: 5,
+                g: 14,
+                b: 2
+            }
+        };
+
+        pane.addBinding(window.fractalColors, 'color', {
+            label: 'Fractal color'
+        });
+
+        const btn = pane.addButton({
+            title: 'Reset zoom and position',
+        });
+
+        btn.on('click', () => {
+            mouse_wheel = 1.0;
+            mouseX = 0.0;
+            mouseY = 0.0;
+            console.log('Reset position & soom!');
+        });
+
+        const btn1 = pane.addButton({
+            title: 'Reset color',
+        });
+
+        btn1.on('click', () => {
+            window.fractalColors.color.r = 5;
+            window.fractalColors.color.g = 14;
+            window.fractalColors.color.b = 2;
+            pane.refresh();
+            console.log('Reset color!');
+        });
+    </script>
+</body>
+
+</html>
