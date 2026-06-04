@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <!-- Tweakpane UI CSS -->
+    <style>
+        :root {
+            --tp-base-font-size: 32px;
+            --tp-container-unit-size: 56px;
+
+            --tp-label-foreground-color: #ffffff;
+            --tp-button-foreground-color: #ffffff;
+        }
+
+        .tp-dfwv {
+            width: 360px !important;
+            font-size: 20px !important;
+            font-weight: 800 !important;
+        }
+
+        .tp-lblv_l {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+            width: 180px !important;
+        }
+
+        .tp-btnv_t,
+        .tp-txtv_i {
+            font-size: 20px !important;
+            font-weight: 800 !important;
+        }
+    </style>
+
+    <script type="module" src="./main.js"></script>
+
+    <!-- script to get the file name without extension, 
+         so that it can be used to load the fragment shaders 
+         of a given fractal (which have the same name as this file) -->
+    <script type="module">
+        const url = new URL(import.meta.url);
+        const fileNameWithExt = url.pathname.split('/').pop();
+
+        const scriptName = fileNameWithExt.substring(0, fileNameWithExt.lastIndexOf('.'));
+        window.fileName = scriptName;
+    </script>
+</head>
+
+<body>
+    <canvas id="webgl-canvas" style="border: none;" width="800" height="800"></canvas>
+</body>
+
+</html>
