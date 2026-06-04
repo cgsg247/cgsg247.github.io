@@ -9,9 +9,9 @@ window.addEventListener("load", () => {
 
     window.fractalColors = {
         color: {
-            r: 5,
-            g: 14,
-            b: 2
+            r: 190,
+            g: 36,
+            b: 36
         }
     };
 
@@ -24,9 +24,10 @@ window.addEventListener("load", () => {
     });
 
     btn.on('click', () => {
-        window.mouse_wheel = 1.0;
-        window.mouseX = 0.0;
-        window.mouseY = 0.0;
+        window.azimuth = 0.0;
+        window.elevation = 0.2;
+        window.camDistance = 2.8;
+        window.UpdateMatrices();
         console.log('Reset position & zoom!');
     });
 
@@ -35,18 +36,18 @@ window.addEventListener("load", () => {
     });
 
     btn1.on('click', () => {
-        window.fractalColors.color.r = 5;
-        window.fractalColors.color.g = 14;
-        window.fractalColors.color.b = 2;
+        window.fractalColors.color.r = 190;
+        window.fractalColors.color.g = 36;
+        window.fractalColors.color.b = 36;
         pane.refresh();
         console.log('Reset color!');
     });
 
-    window.roudness = { size: 0.9 };
+    window.roudness = { size: 1.5 };
 
     pane.addBinding(window.roudness, 'size', {
-        min: 0.9,
-        max: 2,
+        min: 1,
+        max: 2.5,
         step: 0.01,
         label: 'roudness'
     });
