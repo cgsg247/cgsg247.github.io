@@ -33,7 +33,7 @@ let u_mouse_x, u_mouse_y, u_mouse_wheel;
 let u_fractal_color;
 let u_screen_size, u_cam_dist, u_roudness, u_invVP;
 
-let FRAME_W = 800.0, FRAME_H = 800.0;
+let FRAME_W = 1920.0, FRAME_H = 1080.0;
 
 const viewMatrix = mat4.create();
 const projMatrix = mat4.create();
