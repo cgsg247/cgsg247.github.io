@@ -61,5 +61,6 @@ void main() {
         if(t > MAX_DIST)
             break;
     }
-    o_color = vec4(0.3f, 0.47f, 0.8f, 1);
+    //o_color = vec4(0.3f, 0.47f, 0.8f, 1);
+    o_color = vec4(0, 0, 0, 1);
 }
