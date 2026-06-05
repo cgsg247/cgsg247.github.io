@@ -6,12 +6,12 @@ uniform mat4 u_invVP;
 uniform vec2 u_screen_size;
 uniform vec3 u_fractal_color;
 
-const vec3 v0 = vec3(0, 0, 0.81649658f);
-const vec3 v1 = vec3(0.94280904f, 0, -0.40824829f);
-const vec3 v2 = vec3(-0.47140452f, 0.81649658f, -0.40824829f);
-const vec3 v3 = vec3(-0.47140452f, -0.81649658f, -0.40824829f);
+vec3 v0 = vec3(0.0, 0.0, sqrt(6.0) / 3.0);
+vec3 v1 = vec3(2.0 * sqrt(2.0) / 3.0, 0.0, -sqrt(6.0) / 6.0);
+vec3 v2 = vec3(-sqrt(2.0) / 3.0, sqrt(6.0) / 3.0, -sqrt(6.0) / 6.0);
+vec3 v3 = vec3(-sqrt(2.0) / 3.0, -sqrt(6.0) / 3.0, -sqrt(6.0) / 6.0);
 
-float sdf(vec3 p, float R) {
+float sdf( vec3 p, float R ) {
     float d1 = length(p - v0) - R;
     float d2 = length(p - v1) - R;
     float d3 = length(p - v2) - R;
@@ -19,7 +19,7 @@ float sdf(vec3 p, float R) {
     return max(max(max(d1, d2), d3), d4);
 }
 
-vec3 norm(vec3 p, float R) {
+vec3 norm( vec3 p, float R ) {
     vec2 e = vec2(0.001f, 0);
     return normalize(vec3(sdf(p + e.xyy, R) - sdf(p - e.xyy, R), sdf(p + e.yxy, R) - sdf(p - e.yxy, R), sdf(p + e.yyx, R) - sdf(p - e.yyx, R)));
 }
@@ -35,21 +35,21 @@ void main() {
 
     float t = 0.0f;
     float R = u_roudness;
-    const int MAX_STEPS = 120;
-    const float MAX_DIST = 20.0f;
-    const float EPS = 0.002f;
+    int MAX_STEPS = 120;
+    float MAX_DIST = 20.0f;
+    float EPS = 0.002f;
 
-    for(int i = 0; i < MAX_STEPS; i++) {
+    for( int i = 0; i < MAX_STEPS; i++ ) {
         vec3 p = ro + rd * t;
         float d = sdf(p, R);
-        if(d < EPS) {
+        if( d < EPS ) {
             vec3 n = norm(p, R);
 
             float brightness = 0.5f + 0.5f * n.y;
             brightness = clamp(brightness, 0.4f, 1.0f);
 
-            vec3 viewDir = normalize(-rd);   // направление от точки к камере
-            float spec = pow(max(0.0f, dot(n, viewDir)), 16.0f);  // маленький «блеск» без источника света
+            vec3 viewDir = normalize(-rd);
+            float spec = pow(max(0.0f, dot(n, viewDir)), 16.0f);
 
             vec3 albedo = u_fractal_color;
             vec3 color = albedo * (brightness + spec * 0.8f);
