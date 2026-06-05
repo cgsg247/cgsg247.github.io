@@ -1,58 +1,249 @@
 <!DOCTYPE html>
-
+<html lang="ru">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>super chat</title>
-    <style>
-        *,
-        html {
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <!-- <style>
+        *, html {
             margin: 0;
             padding: 0;
             border: 0;
         }
 
-        html {
+        html, body {
             width: 100%;
             height: 100%;
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
         }
 
         body {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            background-color: rgb(236, 152, 42);
+            background: linear-gradient(135deg, rgb(236, 152, 42) 0%, rgb(255, 140, 0) 50%, rgb(200, 100, 20) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
 
-        .center {
-            width: 100%;
-            height: 50%;
-            margin: 0;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-family: "Trebuchet MS", Helvetica, sans-serif;
+        .header {
             text-align: center;
+            padding: 30px 20px 10px;
+            color: white;
         }
 
-        h1 {
-            font-size: 144px;
+        .header h1 {
+            font-size: 72px;
+            text-shadow: 3px 3px 10px rgba(0, 0, 0, 0.3);
+            letter-spacing: 3px;
         }
 
-        p {
-            font-size: 64px;
+        .header p {
+            font-size: 20px;
+            opacity: 0.9;
+            margin-top: 5px;
         }
-    </style>
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
+
+        #main {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 20px;
+        }
+
+        .registration-form {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 50px 40px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            max-width: 450px;
+            width: 100%;
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .registration-form h2 {
+            color: rgb(236, 152, 42);
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+
+        .chat-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 50px rgba(0, 0, 0, 0.2);
+            max-width: 700px;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 2px solid rgb(236, 152, 42);
+            margin-bottom: 20px;
+        }
+
+        .chat-header h2 {
+            color: rgb(236, 152, 42);
+            font-size: 32px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            color: #555;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: rgb(236, 152, 42);
+        }
+
+        button {
+            background: rgb(236, 152, 42);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 16px;
+            font-family: "Trebuchet MS", Helvetica, sans-serif;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(236, 152, 42, 0.3);
+        }
+
+        button:hover {
+            background: rgb(200, 120, 20);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(236, 152, 42, 0.4);
+        }
+
+        #logoutBtn {
+            background: #ff6b6b;
+            padding: 10px 20px;
+            font-size: 14px;
+        }
+
+        #logoutBtn:hover {
+            background: #ee5a5a;
+        }
+
+        .search-section, .messages-section {
+            margin-top: 25px;
+        }
+
+        .search-section h3, .messages-section h3 {
+            color: rgb(236, 152, 42);
+            font-size: 20px;
+            margin-bottom: 15px;
+        }
+
+        .search-result {
+            margin-top: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            min-height: 20px;
+            border-left: 4px solid rgb(236, 152, 42);
+        }
+
+        #messagesList {
+            list-style: none;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 2px solid #eee;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background: #fafafa;
+        }
+
+        #messagesList li {
+            padding: 10px 15px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, rgb(236, 152, 42), rgb(255, 160, 60));
+            color: white;
+            border-radius: 15px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        #messagesList li .time {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        .message-input {
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .error {
+            color: #ff4444;
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .success {
+            color: #28a745;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 48px;
+            }
+            .registration-form, .chat-container {
+                padding: 25px 20px;
+            }
+            .chat-header {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+        }
+    </style> -->
 </head>
 
 <body>
-    <div class="center">
-        <h1>Hello from server! </h1>
-        <p>...</p>
+    <div class="header">
+        <h1>super chat</h1>
+        <p>общайся с друзьями</p>
+    </div>
+    <div id="main">
+        <p style="color: white; font-size: 24px;">Загрузка...</p>
     </div>
     <script src="bundle.js"></script>
-    <div id>
-        <ol id="main"></ol>
-    </div>
 </body>
+</html>
