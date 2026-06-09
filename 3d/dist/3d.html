@@ -33,9 +33,6 @@
 
     <script type="module" src="./main.js"></script>
 
-    <!-- script to get the file name without extension, 
-         so that it can be used to load the fragment shaders 
-         of a given fractal (which have the same name as this file) -->
     <script type="module">
         const url = new URL(import.meta.url);
         const fileNameWithExt = url.pathname.split('/').pop();
