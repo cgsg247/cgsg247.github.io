@@ -39,10 +39,10 @@ void main() {
     float MAX_DIST = 20.0f;
     float EPS = 0.002f;
 
-    for( int i = 0; i < MAX_STEPS; i++ ) {
+    for ( int i = 0; i < MAX_STEPS; i++ ) {
         vec3 p = ro + rd * t;
         float d = sdf(p, R);
-        if( d < EPS ) {
+        if ( d < EPS ) {
             vec3 n = norm(p, R);
 
             float brightness = 0.5f + 0.5f * n.y;
@@ -58,7 +58,7 @@ void main() {
             return;
         }
         t += d;
-        if(t > MAX_DIST)
+        if (t > MAX_DIST)
             break;
     }
     //o_color = vec4(0.3f, 0.47f, 0.8f, 1);
