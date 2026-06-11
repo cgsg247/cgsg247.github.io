@@ -137,13 +137,26 @@
 
         canvas.onwheel = (ev) => {
             const zoomFactor = 1.1;
+            const oldZoom = window.mouse_wheel;
+
+            const mouseNormX = ev.offsetX / canvas.width;
+            const mouseNormY = ev.offsetY / canvas.height;
+
+            const worldXBefore = window.mouseX + (mouseNormX - 0.5) * (4.0 / oldZoom);
+            const worldYBefore = window.mouseY + (mouseNormY - 0.5) * (4.0 / oldZoom);
 
             if (ev.deltaY < 0)
                 window.mouse_wheel *= zoomFactor;
             else
                 window.mouse_wheel /= zoomFactor;
             window.mouse_wheel = Math.max(0.1, window.mouse_wheel);
-            console.log(`Scroll wheel: ${window.mouse_wheel}`);
+
+            const newZoom = window.mouse_wheel;
+            const worldXAfter = window.mouseX + (mouseNormX - 0.5) * (4.0 / newZoom);
+            const worldYAfter = window.mouseY + (mouseNormY - 0.5) * (4.0 / newZoom);
+
+            window.mouseX += worldXBefore - worldXAfter;
+            window.mouseY += worldYBefore - worldYAfter;
         };
 
         initGL(canvas);
