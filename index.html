@@ -8,35 +8,43 @@
     
     <style>
         body {
-            background-color: #0d0214;
-            background-image: linear-gradient(rgba(255, 0, 128, 0.05) 1px, transparent 1px),
-                              linear-gradient(90deg, rgba(255, 0, 128, 0.05) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-color: #008080;
             height: 100vh;
             margin: 0;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            font-family: 'Press Start 2P', monospace;
-            overflow: hidden;
+            font-family: 'Courier Prime', 'Courier New', monospace;
+            -webkit-font-smoothing: none;
         }
 
-        h1 {
-            color: #ff007f;
-            font-size: 28px;
-            text-shadow: 0 0 10px #ff007f, 0 0 20px #ff007f;
-            margin-bottom: 40px;
-            text-align: center;
-            letter-spacing: 2px;
+        .window {
+            background-color: #c0c0c0;
+            border-top: 2px solid #fff;
+            border-left: 2px solid #fff;
+            border-right: 2px solid #808080;
+            border-bottom: 2px solid #808080;
+            box-shadow: 1px 1px 0 0 #000;
+            padding: 4px;
+            width: 90%;
+            max-width: 450px;
+        }
+
+        .title-bar {
+            background: linear-gradient(90deg, #000080, #1084d0);
+            color: #ffffff;
+            padding: 4px 6px;
+            font-size: 14px;
+            font-weight: bold;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
         }
 
         .menu {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            width: 90%;
-            max-width: 480px;
+            gap: 12px;
+            padding: 10px;
         }
 
         h2 {
@@ -47,35 +55,46 @@
         h2 a {
             display: block;
             text-decoration: none;
-            color: #00ffff;
-            font-size: 12px;
-            padding: 18px;
-            border: 2px solid #00ffff;
-            border-radius: 4px;
-            text-shadow: 0 0 5px #00ffff;
-            box-shadow: 0 0 10px rgba(0, 255, 255, 0.2);
-            transition: all 0.2s ease-in-out;
+            color: #000000;
+            font-size: 14px;
+            padding: 10px;
+            background-color: #c0c0c0;
             text-align: center;
-            letter-spacing: 1px;
+            
+            border-top: 2px solid #fff;
+            border-left: 2px solid #fff;
+            border-right: 2px solid #808080;
+            border-bottom: 2px solid #808080;
+            box-shadow: 1px 1px 0 0 #000;
+            cursor: pointer;
         }
 
         h2 a:hover {
-            color: #ffffff;
-            background-color: #00ffff;
-            box-shadow: 0 0 25px #00ffff, 0 0 10px #00ffff;
-            transform: scale(1.03);
+            background-color: #d8d8d8;
+        }
+
+        h2 a:active {
+            border-top: 2px solid #808080;
+            border-left: 2px solid #808080;
+            border-right: 2px solid #fff;
+            border-bottom: 2px solid #fff;
+            box-shadow: none;
+            padding: 11px 9px 9px 11px; /* Сдвиг текста для имитации нажатия */
         }
     </style>
 </head>
 <body>
-
-    <h1>AA3 Projects</h1>
-    
-    <div class="menu">
-        <h2><a href="fractals/dist/fractals.html">Fractals</a></h2>
-        <h2><a href="3d/dist/3d.html">3D</a></h2>
-        <h2><a href="http://155.212.173">chat</a></h2>
-        <h2><a href="THG/dist/index.html">Backrooms - horror game</a></h2>
+    <div class="window">
+        <div class="title-bar">
+            AA3 Projects.exe
+        </div>
+        
+        <div class="menu">
+            <h2><a href="fractals/dist/fractals.html">Fractals</a></h2>
+            <h2><a href="3d/dist/3d.html">3D</a></h2>
+            <h2><a href="http://155.212.173">Chat</a></h2>
+            <h2><a href="THG/dist/index.html">Backrooms - horror game</a></h2>
+        </div>
     </div>
 
 </body>
