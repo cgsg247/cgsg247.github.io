@@ -11,7 +11,7 @@ function updateFlashlightUI(flashlightUI, state) {
 }
 
 export function createFlashlight(scene, camera) {
-  // Создание фонарика
+  // Create flashlight
   flashlight = new THREE.SpotLight(0xffeedd);
   flashlight.intensity = 3.0;
   flashlight.distance = 20;
@@ -19,8 +19,8 @@ export function createFlashlight(scene, camera) {
   flashlight.penumbra = 0.5;
   flashlight.decay = 1.0;
   flashlight.castShadow = true;
-  flashlight.shadow.mapSize.width = 1024;
-  flashlight.shadow.mapSize.height = 1024;
+  flashlight.shadow.mapSize.width = 2048;
+  flashlight.shadow.mapSize.height = 2048;
   flashlight.shadow.bias = -0.0001;
 
   flashlightTarget = new THREE.Object3D();
@@ -73,7 +73,6 @@ export function enableFlashlightUI() {
       isFlashlightOn = !isFlashlightOn;
       flashlight.intensity = isFlashlightOn ? 3.0 : 0;
       updateFlashlightUI(flashlightUI, isFlashlightOn);
-      console.log(`Фонарик ${isFlashlightOn ? "включён" : "выключен"}`);
     }
   });
 }

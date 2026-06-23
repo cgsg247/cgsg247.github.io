@@ -1,13 +1,15 @@
 import * as THREE from "three";
 import RAPIER from "@dimforge/rapier3d-compat";
 
-// Массив для синхронизации физики с графикой
+// Physic bodies array for synchronize with graphics
 const physicsPairs = [];
 export { physicsPairs };
 
+export let playerCollider = null;
+
 export function create3dBodies(scene, world) {
-  // 5. Создаем физический пол
-  const floorSize = 100;
+  // Create physical floor
+  const floorSize = 200;
   const floorThickness = 0.4;
 
   const floorBodyDesc = RAPIER.RigidBodyDesc.fixed().setTranslation(
@@ -32,8 +34,7 @@ export function create3dBodies(scene, world) {
   floorMesh.position.y = -floorThickness / 2;
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
-
-  // 6. Создаем физический куб (Препятствие на карте)
+  // Create physical cube
   const cubeGeo = new THREE.BoxGeometry(2, 2, 2);
   const cubeMat = new THREE.MeshStandardMaterial({
     color: 0x00ff00,
@@ -44,7 +45,14 @@ export function create3dBodies(scene, world) {
   cubeMesh.receiveShadow = true;
   scene.add(cubeMesh);
 
-  const sphereRadius = 1;
+  const cubeBodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(0, 2, 3);
+  const cubeBody = world.createRigidBody(cubeBodyDesc);
+  const cubeColliderDesc = RAPIER.ColliderDesc.cuboid(1, 1, 1);
+  world.createCollider(cubeColliderDesc, cubeBody);
+  physicsPairs.push({ mesh: cubeMesh, body: cubeBody });
+
+  // Create physical ball
+  const sphereRadius = 0.3;
   const sphereGeo = new THREE.SphereGeometry(sphereRadius, 32, 32);
   const sphereMat = new THREE.MeshStandardMaterial({
     color: 0xff0000,
@@ -55,16 +63,10 @@ export function create3dBodies(scene, world) {
   sphereMesh.receiveShadow = true;
   scene.add(sphereMesh);
 
-  const cubeBodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(0, 6, -5);
-  const cubeBody = world.createRigidBody(cubeBodyDesc);
-  const cubeColliderDesc = RAPIER.ColliderDesc.cuboid(1, 1, 1);
-  world.createCollider(cubeColliderDesc, cubeBody);
-  physicsPairs.push({ mesh: cubeMesh, body: cubeBody });
-
   const sphereBodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(
     0,
-    12,
-    -5,
+    1,
+    -1,
   );
   const sphereBody = world.createRigidBody(sphereBodyDesc);
   const sphereColliderDesc = RAPIER.ColliderDesc.ball(sphereRadius);
@@ -73,16 +75,13 @@ export function create3dBodies(scene, world) {
 }
 
 export function createPlayer(world) {
-  // ==============================
-  // 7. СОЗДАЕМ ФИЗИЧЕСКОГО ИГРОКА
-  // ==============================
-
-  // Физическое тело игрока (Капсула, чтобы не застревать в углах)
+  // Create phusical player (capsula)
   const playerBodyDesc = RAPIER.RigidBodyDesc.dynamic()
-    .setTranslation(0, 10, 0) // Старт над полом
-    .lockRotations(); // Запрещаем игроку падать на бок (очень важно!)
+    .setTranslation(0, 2, 0)
+    .lockRotations();
   const playerBody = world.createRigidBody(playerBodyDesc);
-  const playerColliderDesc = RAPIER.ColliderDesc.capsule(0.5, 0.5); // радиус 0.5, высота 1
-  world.createCollider(playerColliderDesc, playerBody);
+  const playerColliderDesc = RAPIER.ColliderDesc.capsule(0.5, 0.5);
+  const collider = world.createCollider(playerColliderDesc, playerBody);
+  playerCollider = collider;
   return playerBody;
 }
