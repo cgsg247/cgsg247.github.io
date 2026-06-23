@@ -1,0 +1,141 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: #0b0d15;
+    background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(72, 49, 212, 0.12) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 50%, rgba(212, 49, 140, 0.10) 0%, transparent 60%),
+        radial-gradient(ellipse at 50% 100%, rgba(49, 212, 180, 0.06) 0%, transparent 50%);
+    padding: 1.5rem;
+    position: relative;
+}
+
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+}
+
+body > h1 {
+    font-size: 3.8rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #f0eaff 0%, #b7a9ff 45%, #ff8cdd 75%, #ffb56b 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 60px rgba(140, 90, 255, 0.20);
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+body > h2 > a:not([href="/index.html"]) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.1rem 1.8rem;
+    text-decoration: none;
+    color: rgba(255, 255, 255, 0.78);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 1.2rem;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    width: 100%;
+    max-width: 400px;
+    margin: 0.5rem 0;
+}
+
+body > h2 > a:not([href="/index.html"])::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.02), transparent 60%);
+    pointer-events: none;
+    border-radius: 1.2rem;
+}
+
+body > h2 > a:not([href="/index.html"]):hover {
+    background: rgba(255, 255, 255, 0.07);
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    transform: translateX(6px) scale(1.01);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+}
+
+body > h2 > a[href="/index.html"],
+body > a[href="/index.html"] {
+    position: fixed;
+    top: 1.5rem;
+    left: 1.5rem;
+    padding: 0.8rem 1.6rem;
+    background: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 2rem;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    z-index: 10;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+body > h2 > a[href="/index.html"]:hover,
+body > a[href="/index.html"]:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+    transform: scale(1.05);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+canvas#webgl-canvas {
+    border-radius: 1.5rem;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.04);
+    max-width: 90vw;
+    max-height: 80vh;
+    width: auto;
+    height: auto;
+    background: #0b0d15;
+    margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+    body > h1 {
+        font-size: 2.8rem;
+    }
+    body > h2 > a:not([href="/index.html"]) {
+        padding: 0.9rem 1.3rem;
+        font-size: 1rem;
+    }
+    canvas#webgl-canvas {
+        max-width: 95vw;
+        max-height: 70vh;
+    }
+    body > h2 > a[href="/index.html"],
+    body > a[href="/index.html"] {
+        top: 1rem;
+        left: 1rem;
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
+}
