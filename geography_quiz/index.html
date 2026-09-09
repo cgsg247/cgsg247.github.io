@@ -1,185 +1,182 @@
 <!doctype html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Интерактивный тест по странам и столицам Европы">
-    <title>Europe Atlas — страны и столицы</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f4f7fb">
+    <meta name="description" content="Интерактивная тренировка по странам и столицам Европы">
+    <title>Европа — География</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="background"></div>
-
-    <main class="app">
-        <header class="header">
-            <div class="brand">
-                <div class="brand-mark">EU</div>
-                <div>
-                    <div class="brand-title">Europe Atlas</div>
-                    <div class="brand-subtitle">География · страны · столицы</div>
-                </div>
-            </div>
-            <div class="header-stats">
-                <div class="stat">
-                    <span id="headerScore">0</span>
-                    <small>очков</small>
-                </div>
-                <div class="stat">
-                    <span id="headerStreak">0</span>
-                    <small>серия</small>
-                </div>
+    <div class="site-shell">
+        <header class="topbar">
+            <a class="logo" href="#" id="logoButton" aria-label="На главную">
+                <span class="logo-mark">Е</span>
+                <span>
+                    <strong>Европа</strong>
+                    <small>ГЕОГРАФИЯ</small>
+                </span>
+            </a>
+            <div class="topbar-right">
+                <div class="mini-stat"><b id="topScore">0</b><span>очков</span></div>
+                <div class="mini-stat"><b id="topStreak">0</b><span>серия</span></div>
             </div>
         </header>
 
-        <section id="homeScreen" class="screen">
-            <div class="hero">
-                <div class="hero-copy">
-                    <span class="pill">50 стран Европы</span>
-                    <h1>Проверь, насколько хорошо ты знаешь Европу.</h1>
-                    <p>Выбирай режим, находи страны на карте, вспоминай столицы и постепенно усложняй задания.</p>
-                </div>
-                <div class="hero-orbit">
-                    <div class="orbit-card card-one">🇫🇷<span>Париж</span></div>
-                    <div class="orbit-card card-two">🇳🇴<span>Осло</span></div>
-                    <div class="orbit-card card-three">🇮🇹<span>Рим</span></div>
-                    <div class="orbit-center">EU</div>
-                </div>
-            </div>
-
-            <div class="mode-section">
-                <div class="section-heading">
-                    <div>
-                        <span class="section-kicker">ШАГ 01</span>
-                        <h2>Выбери режим</h2>
+        <main>
+            <section id="homeScreen">
+                <section class="intro">
+                    <div class="intro-copy">
+                        <div class="eyebrow">ИНТЕРАКТИВНЫЙ ТРЕНАЖЁР</div>
+                        <h1>Знаешь Европу?<br><span>Проверь себя.</span></h1>
+                        <p>Страны, столицы и карта. Выбирай формат, отвечай и сразу видь результат.</p>
                     </div>
-                    <span class="mode-count">6 режимов</span>
+                    <div class="map-preview" aria-hidden="true">
+                        <div class="preview-label">EUROPE</div>
+                        <div class="preview-dot dot-a"></div>
+                        <div class="preview-dot dot-b"></div>
+                        <div class="preview-dot dot-c"></div>
+                        <div class="preview-dot dot-d"></div>
+                        <div class="preview-line"></div>
+                    </div>
+                </section>
+
+                <section class="content-section">
+                    <div class="section-title">
+                        <div>
+                            <span>01</span>
+                            <h2>Что будем проверять?</h2>
+                        </div>
+                        <p>Выбери один режим</p>
+                    </div>
+
+                    <div class="mode-grid">
+                        <button class="mode-card active" data-mode="map-country">
+                            <span class="mode-number">01</span>
+                            <span class="mode-symbol">⌖</span>
+                            <strong>Найди страну</strong>
+                            <small>Тебе называют страну — покажи её на карте.</small>
+                        </button>
+                        <button class="mode-card" data-mode="country-capital">
+                            <span class="mode-number">02</span>
+                            <span class="mode-symbol">Aa</span>
+                            <strong>Страна → столица</strong>
+                            <small>Назови столицу страны из четырёх вариантов.</small>
+                        </button>
+                        <button class="mode-card" data-mode="capital-country">
+                            <span class="mode-number">03</span>
+                            <span class="mode-symbol">⌂</span>
+                            <strong>Столица → страна</strong>
+                            <small>По столице определи государство.</small>
+                        </button>
+                        <button class="mode-card" data-mode="country-map">
+                            <span class="mode-number">04</span>
+                            <span class="mode-symbol">◎</span>
+                            <strong>Страна → карта</strong>
+                            <small>Увидь название и найди государство на карте.</small>
+                        </button>
+                        <button class="mode-card" data-mode="capital-map">
+                            <span class="mode-number">05</span>
+                            <span class="mode-symbol">✦</span>
+                            <strong>Столица → карта</strong>
+                            <small>По столице найди соответствующую страну.</small>
+                        </button>
+                        <button class="mode-card" data-mode="mixed">
+                            <span class="mode-number">06</span>
+                            <span class="mode-symbol">✹</span>
+                            <strong>Смешанный</strong>
+                            <small>Все режимы перемешиваются в одной тренировке.</small>
+                        </button>
+                    </div>
+                </section>
+
+                <section class="content-section setup-section">
+                    <div class="section-title">
+                        <div>
+                            <span>02</span>
+                            <h2>Настройки</h2>
+                        </div>
+                    </div>
+                    <div class="settings">
+                        <label>
+                            <span>Сложность</span>
+                            <select id="difficulty">
+                                <option value="all">Все страны Европы</option>
+                                <option value="standard">Основные страны</option>
+                                <option value="hard">Малые и сложные</option>
+                            </select>
+                        </label>
+                        <label>
+                            <span>Количество</span>
+                            <select id="questionCount">
+                                <option value="10">10 вопросов</option>
+                                <option value="20">20 вопросов</option>
+                                <option value="30">30 вопросов</option>
+                                <option value="all">Все доступные</option>
+                            </select>
+                        </label>
+                        <button id="startButton" class="start-button">Начать <span>→</span></button>
+                    </div>
+                </section>
+            </section>
+
+            <section id="quizScreen" class="hidden">
+                <div class="quiz-head">
+                    <button id="backButton" class="round-button">←</button>
+                    <div class="progress-area">
+                        <div class="progress-info"><span id="progressText">1 / 10</span><span id="accuracyText">Точность 0%</span></div>
+                        <div class="progress-track"><div id="progressBar"></div></div>
+                    </div>
+                    <button id="restartButton" class="round-button">↻</button>
                 </div>
 
-                <div class="mode-grid">
-                    <button class="mode-card selected" data-mode="map-country">
-                        <span class="mode-icon">⌖</span>
-                        <span class="mode-name">Найди страну</span>
-                        <span class="mode-description">На карте показана Европа. Нажми на страну, которую назовёт тест.</span>
-                    </button>
-                    <button class="mode-card" data-mode="country-capital">
-                        <span class="mode-icon">A</span>
-                        <span class="mode-name">Страна → столица</span>
-                        <span class="mode-description">Увидь страну и выбери её столицу из вариантов.</span>
-                    </button>
-                    <button class="mode-card" data-mode="capital-country">
-                        <span class="mode-icon">⌂</span>
-                        <span class="mode-name">Столица → страна</span>
-                        <span class="mode-description">Получишь название столицы и определишь государство.</span>
-                    </button>
-                    <button class="mode-card" data-mode="country-map">
-                        <span class="mode-icon">◎</span>
-                        <span class="mode-name">Страна → карта</span>
-                        <span class="mode-description">Тест на пространственное представление: найди страну на карте.</span>
-                    </button>
-                    <button class="mode-card" data-mode="capital-map">
-                        <span class="mode-icon">✦</span>
-                        <span class="mode-name">Столица → карта</span>
-                        <span class="mode-description">По столице определи, какую страну нужно выбрать на карте.</span>
-                    </button>
-                    <button class="mode-card" data-mode="mixed">
-                        <span class="mode-icon">✹</span>
-                        <span class="mode-name">Смешанный</span>
-                        <span class="mode-description">Все типы заданий перемешиваются автоматически.</span>
-                    </button>
+                <div class="question-panel">
+                    <div id="questionMode" class="question-label"></div>
+                    <div id="questionText" class="question"></div>
+                    <div id="answerArea"></div>
+                    <div id="feedback" class="feedback"></div>
+                    <button id="nextButton" class="start-button next-button hidden">Следующий вопрос <span>→</span></button>
                 </div>
-            </div>
 
-            <div class="settings-section">
-                <div class="section-heading">
-                    <div>
-                        <span class="section-kicker">ШАГ 02</span>
-                        <h2>Настрой тест</h2>
+                <div id="mapCard" class="map-panel hidden">
+                    <div class="map-head">
+                        <div>
+                            <span class="map-label">КАРТА ЕВРОПЫ</span>
+                            <h2>Выбери страну</h2>
+                        </div>
+                        <div id="mapInstruction" class="map-instruction">Нажми на нужную страну</div>
+                    </div>
+                    <div id="mapContainer"></div>
+                    <div class="map-tip"><span></span> Наведи или нажми на страну</div>
+                </div>
+            </section>
+
+            <section id="resultScreen" class="hidden">
+                <div class="result">
+                    <div class="result-badge">✓</div>
+                    <span class="eyebrow">ГОТОВО</span>
+                    <h1 id="resultTitle">Отличная работа!</h1>
+                    <div class="big-score"><b id="resultScore">0</b><span>очков</span></div>
+                    <div class="result-stats">
+                        <div><b id="resultCorrect">0</b><span>правильных</span></div>
+                        <div><b id="resultTotal">0</b><span>вопросов</span></div>
+                        <div><b id="resultAccuracy">0%</b><span>точность</span></div>
+                        <div><b id="resultBestStreak">0</b><span>лучшая серия</span></div>
+                    </div>
+                    <div class="result-actions">
+                        <button id="againButton" class="start-button">Повторить <span>↻</span></button>
+                        <button id="homeButton" class="plain-button">Выбрать другой режим</button>
                     </div>
                 </div>
-                <div class="settings-grid">
-                    <label class="setting">
-                        <span>Набор стран</span>
-                        <select id="difficulty">
-                            <option value="all">Все 50 стран</option>
-                            <option value="standard">Основные страны</option>
-                            <option value="hard">Малые и сложные</option>
-                        </select>
-                    </label>
-                    <label class="setting">
-                        <span>Количество вопросов</span>
-                        <select id="questionCount">
-                            <option value="10">10 вопросов</option>
-                            <option value="20">20 вопросов</option>
-                            <option value="30">30 вопросов</option>
-                            <option value="all">Все доступные</option>
-                        </select>
-                    </label>
-                    <button id="startButton" class="primary-button">
-                        Начать тренировку
-                        <span>→</span>
-                    </button>
-                </div>
-            </div>
-        </section>
+            </section>
+        </main>
 
-        <section id="quizScreen" class="screen hidden">
-            <div class="quiz-toolbar">
-                <button id="backButton" class="icon-button" aria-label="Вернуться">←</button>
-                <div class="progress-wrap">
-                    <div class="progress-label">
-                        <span id="progressText">1 / 10</span>
-                        <span id="accuracyText">0%</span>
-                    </div>
-                    <div class="progress-bar"><div id="progressBar"></div></div>
-                </div>
-                <button id="restartButton" class="icon-button" aria-label="Начать заново">↻</button>
-            </div>
-
-            <div class="question-card">
-                <div id="questionMode" class="question-mode"></div>
-                <div id="questionText" class="question-text"></div>
-                <div id="answerArea"></div>
-                <div id="feedback" class="feedback"></div>
-                <button id="nextButton" class="primary-button next-button hidden">Следующий вопрос <span>→</span></button>
-            </div>
-
-            <div id="mapCard" class="map-card hidden">
-                <div class="map-header">
-                    <div>
-                        <span class="section-kicker">ИНТЕРАКТИВНАЯ КАРТА</span>
-                        <h2>Европа</h2>
-                    </div>
-                    <span id="mapInstruction" class="map-instruction">Нажми на нужную страну</span>
-                </div>
-                <div id="mapContainer"></div>
-                <div class="map-legend">
-                    <span><i class="legend-dot available"></i> страна</span>
-                    <span><i class="legend-dot target"></i> цель</span>
-                    <span><i class="legend-dot selected-dot"></i> выбор</span>
-                </div>
-            </div>
-        </section>
-
-        <section id="resultScreen" class="screen hidden">
-            <div class="result-card">
-                <div class="result-icon">✓</div>
-                <span class="section-kicker">ТРЕНИРОВКА ЗАВЕРШЕНА</span>
-                <h1 id="resultTitle">Отличная работа!</h1>
-                <div class="result-score"><span id="resultScore">0</span><small>очков</small></div>
-                <div class="result-grid">
-                    <div><strong id="resultCorrect">0</strong><span>правильных</span></div>
-                    <div><strong id="resultTotal">0</strong><span>вопросов</span></div>
-                    <div><strong id="resultAccuracy">0%</strong><span>точность</span></div>
-                    <div><strong id="resultBestStreak">0</strong><span>лучшая серия</span></div>
-                </div>
-                <div class="result-actions">
-                    <button id="againButton" class="primary-button">Повторить <span>↻</span></button>
-                    <button id="homeButton" class="secondary-button">Выбрать другой режим</button>
-                </div>
-            </div>
-        </section>
-    </main>
-
+        <footer>
+            <span>Европа · страны и столицы</span>
+            <span>50 стран</span>
+        </footer>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>

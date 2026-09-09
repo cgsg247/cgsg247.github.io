@@ -83,62 +83,69 @@ const state = {
     pool: [],
     index: 0,
     current: null,
+    currentMapMode: null,
     score: 0,
     streak: 0,
     bestStreak: 0,
     correct: 0,
     answered: false,
-    mapData: null,
-    currentMapMode: null
+    mapData: null
 };
 
-const elements = {
-    home: document.getElementById("homeScreen"),
-    quiz: document.getElementById("quizScreen"),
-    result: document.getElementById("resultScreen"),
+const $ = id => document.getElementById(id);
+
+const ui = {
+    home: $("homeScreen"),
+    quiz: $("quizScreen"),
+    result: $("resultScreen"),
     modeCards: document.querySelectorAll(".mode-card"),
-    difficulty: document.getElementById("difficulty"),
-    count: document.getElementById("questionCount"),
-    start: document.getElementById("startButton"),
-    back: document.getElementById("backButton"),
-    restart: document.getElementById("restartButton"),
-    next: document.getElementById("nextButton"),
-    again: document.getElementById("againButton"),
-    homeButton: document.getElementById("homeButton"),
-    progress: document.getElementById("progressText"),
-    accuracy: document.getElementById("accuracyText"),
-    progressBar: document.getElementById("progressBar"),
-    questionMode: document.getElementById("questionMode"),
-    question: document.getElementById("questionText"),
-    answers: document.getElementById("answerArea"),
-    feedback: document.getElementById("feedback"),
-    mapCard: document.getElementById("mapCard"),
-    mapHint: document.getElementById("mapInstruction"),
-    map: document.getElementById("mapContainer"),
-    headerScore: document.getElementById("headerScore"),
-    headerStreak: document.getElementById("headerStreak"),
-    resultTitle: document.getElementById("resultTitle"),
-    resultScore: document.getElementById("resultScore"),
-    resultCorrect: document.getElementById("resultCorrect"),
-    resultTotal: document.getElementById("resultTotal"),
-    resultAccuracy: document.getElementById("resultAccuracy"),
-    resultBestStreak: document.getElementById("resultBestStreak")
+    difficulty: $("difficulty"),
+    count: $("questionCount"),
+    start: $("startButton"),
+    back: $("backButton"),
+    restart: $("restartButton"),
+    again: $("againButton"),
+    homeButton: $("homeButton"),
+    next: $("nextButton"),
+    progress: $("progressText"),
+    accuracy: $("accuracyText"),
+    progressBar: $("progressBar"),
+    questionMode: $("questionMode"),
+    question: $("questionText"),
+    answers: $("answerArea"),
+    feedback: $("feedback"),
+    mapCard: $("mapCard"),
+    mapInstruction: $("mapInstruction"),
+    map: $("mapContainer"),
+    topScore: $("topScore"),
+    topStreak: $("topStreak"),
+    resultTitle: $("resultTitle"),
+    resultScore: $("resultScore"),
+    resultCorrect: $("resultCorrect"),
+    resultTotal: $("resultTotal"),
+    resultAccuracy: $("resultAccuracy"),
+    resultBestStreak: $("resultBestStreak")
 };
 
-elements.modeCards.forEach(card => {
+ui.modeCards.forEach(card => {
     card.addEventListener("click", () => {
-        elements.modeCards.forEach(item => item.classList.remove("selected"));
-        card.classList.add("selected");
+        ui.modeCards.forEach(item => item.classList.remove("active"));
+        card.classList.add("active");
         state.mode = card.dataset.mode;
     });
 });
 
-elements.start.addEventListener("click", startQuiz);
-elements.back.addEventListener("click", showHome);
-elements.restart.addEventListener("click", startQuiz);
-elements.again.addEventListener("click", startQuiz);
-elements.homeButton.addEventListener("click", showHome);
-elements.next.addEventListener("click", () => {
+ui.start.addEventListener("click", startQuiz);
+ui.restart.addEventListener("click", startQuiz);
+ui.again.addEventListener("click", startQuiz);
+ui.back.addEventListener("click", showHome);
+ui.homeButton.addEventListener("click", showHome);
+$("logoButton").addEventListener("click", event => {
+    event.preventDefault();
+    showHome();
+});
+
+ui.next.addEventListener("click", () => {
     state.index += 1;
     renderQuestion();
 });
@@ -154,8 +161,8 @@ function shuffle(items) {
     return result;
 }
 
-function getPool() {
-    const difficulty = elements.difficulty.value;
+function getAvailableCountries() {
+    const difficulty = ui.difficulty.value;
 
     if (difficulty === "standard") {
         return countries.filter(country => majorCodes.has(country[2]));
@@ -169,26 +176,25 @@ function getPool() {
 }
 
 function startQuiz() {
-    const available = getPool();
-    const requested = elements.count.value === "all"
-        ? available.length
-        : Number(elements.count.value);
+    const available = getAvailableCountries();
+    const amount = ui.count.value === "all" ? available.length : Number(ui.count.value);
 
-    state.pool = shuffle(available).slice(0, Math.min(requested, available.length));
+    state.pool = shuffle(available).slice(0, Math.min(amount, available.length));
     state.index = 0;
     state.current = null;
+    state.currentMapMode = null;
     state.score = 0;
     state.streak = 0;
     state.bestStreak = 0;
     state.correct = 0;
 
-    elements.headerScore.textContent = "0";
-    elements.headerStreak.textContent = "0";
-    elements.home.classList.add("hidden");
-    elements.result.classList.add("hidden");
-    elements.quiz.classList.remove("hidden");
+    updateHeader();
+    ui.home.classList.add("hidden");
+    ui.result.classList.add("hidden");
+    ui.quiz.classList.remove("hidden");
 
     renderQuestion();
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function renderQuestion() {
@@ -200,61 +206,66 @@ function renderQuestion() {
     state.current = state.pool[state.index];
     state.answered = false;
 
-    const selectedMode = state.mode === "mixed"
+    const mode = state.mode === "mixed"
         ? shuffle(["country-capital", "capital-country", "map-country", "country-map", "capital-map"])[0]
         : state.mode;
 
-    state.currentMapMode = selectedMode;
+    state.currentMapMode = mode;
 
-    elements.progress.textContent = `${state.index + 1} / ${state.pool.length}`;
-    elements.progressBar.style.width = `${((state.index + 1) / state.pool.length) * 100}%`;
-    elements.accuracy.textContent = `${getAccuracy()}%`;
-    elements.feedback.textContent = "";
-    elements.next.classList.add("hidden");
-    elements.answers.replaceChildren();
-    elements.mapCard.classList.add("hidden");
+    ui.progress.textContent = `${state.index + 1} / ${state.pool.length}`;
+    ui.progressBar.style.width = `${((state.index + 1) / state.pool.length) * 100}%`;
+    ui.accuracy.textContent = `Точность ${getAccuracy()}%`;
+    ui.feedback.textContent = "";
+    ui.next.classList.add("hidden");
+    ui.answers.replaceChildren();
+    ui.mapCard.classList.add("hidden");
 
-    if (selectedMode === "map-country" || selectedMode === "country-map" || selectedMode === "capital-map") {
-        renderMapQuestion(selectedMode);
+    if (isMapMode(mode)) {
+        renderMapQuestion(mode);
         return;
     }
 
-    renderChoiceQuestion(selectedMode);
+    renderChoiceQuestion(mode);
+}
+
+function isMapMode(mode) {
+    return mode === "map-country" || mode === "country-map" || mode === "capital-map";
 }
 
 function renderChoiceQuestion(mode) {
-    const isCountryToCapital = mode === "country-capital";
-    const correct = isCountryToCapital ? state.current[1] : state.current[0];
+    const countryToCapital = mode === "country-capital";
+    const correct = countryToCapital ? state.current[1] : state.current[0];
 
-    elements.questionMode.textContent = isCountryToCapital
+    ui.questionMode.textContent = countryToCapital
         ? "СТРАНА → СТОЛИЦА"
         : "СТОЛИЦА → СТРАНА";
 
-    elements.question.innerHTML = isCountryToCapital
+    ui.question.innerHTML = countryToCapital
         ? `Какая столица у страны <strong>${state.current[0]}</strong>?`
         : `К какой стране относится столица <strong>${state.current[1]}</strong>?`;
 
-    const candidates = shuffle([
+    const alternatives = countryToCapital
+        ? countries.map(country => country[1])
+        : countries.map(country => country[0]);
+
+    const options = shuffle([
         correct,
-        ...shuffle(
-            countries
-                .map(country => isCountryToCapital ? country[1] : country[0])
-                .filter(value => value !== correct)
-        ).slice(0, 3)
+        ...shuffle(alternatives.filter(value => value !== correct)).slice(0, 3)
     ]);
 
     const wrapper = document.createElement("div");
     wrapper.className = "answers";
 
-    candidates.forEach(answer => {
+    options.forEach(option => {
         const button = document.createElement("button");
         button.className = "answer-button";
-        button.textContent = answer;
-        button.addEventListener("click", () => checkChoice(button, answer, correct));
+        button.type = "button";
+        button.textContent = option;
+        button.addEventListener("click", () => checkChoice(button, option, correct));
         wrapper.appendChild(button);
     });
 
-    elements.answers.appendChild(wrapper);
+    ui.answers.appendChild(wrapper);
 }
 
 function checkChoice(button, answer, correct) {
@@ -263,61 +274,56 @@ function checkChoice(button, answer, correct) {
     }
 
     state.answered = true;
-
     document.querySelectorAll(".answer-button").forEach(item => {
         item.disabled = true;
     });
 
-    const isCorrect = answer === correct;
-
-    button.classList.add(isCorrect ? "correct" : "wrong");
-
-    if (isCorrect) {
+    if (answer === correct) {
+        button.classList.add("correct");
         registerCorrect();
-        elements.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
+        ui.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
     } else {
+        button.classList.add("wrong");
+        document.querySelectorAll(".answer-button").forEach(item => {
+            if (item.textContent === correct) {
+                item.classList.add("correct");
+            }
+        });
         registerWrong();
-        elements.feedback.textContent = `✗ Правильный ответ: ${correct}.`;
+        ui.feedback.textContent = `✗ Правильный ответ: ${correct}.`;
     }
 
     finishAnswer();
 }
 
 async function renderMapQuestion(mode) {
-    elements.mapCard.classList.remove("hidden");
-    elements.questionMode.textContent = getMapModeTitle(mode);
+    ui.mapCard.classList.remove("hidden");
+    ui.questionMode.textContent = {
+        "map-country": "НАЙДИ СТРАНУ",
+        "country-map": "СТРАНА → КАРТА",
+        "capital-map": "СТОЛИЦА → КАРТА"
+    }[mode];
 
     if (mode === "map-country") {
-        elements.question.innerHTML = "Какая страна указана в задании?";
-        elements.mapHint.textContent = "Нажми на названную страну";
+        ui.question.innerHTML = `Найди на карте <strong>${state.current[0]}</strong>`;
     }
 
     if (mode === "country-map") {
-        elements.question.innerHTML = `Найди на карте <strong>${state.current[0]}</strong>`;
-        elements.mapHint.textContent = "Нажми на нужную страну";
+        ui.question.innerHTML = `Где находится <strong>${state.current[0]}</strong>?`;
     }
 
     if (mode === "capital-map") {
-        elements.question.innerHTML = `Где находится страна со столицей <strong>${state.current[1]}</strong>?`;
-        elements.mapHint.textContent = "Нажми на нужную страну";
+        ui.question.innerHTML = `Где находится страна со столицей <strong>${state.current[1]}</strong>?`;
     }
+
+    ui.mapInstruction.textContent = "Нажми на нужную страну";
 
     try {
         await loadMap();
-        renderMapTarget(mode);
+        paintMapTarget();
     } catch {
-        elements.map.innerHTML = `<div class="map-error">Не удалось загрузить карту. Проверь подключение к интернету.</div>`;
+        ui.map.innerHTML = `<div class="map-error">Карта не загрузилась. Проверь интернет-соединение и обнови страницу.</div>`;
     }
-}
-
-function getMapModeTitle(mode) {
-    const titles = {
-        "map-country": "КАРТА → СТРАНА",
-        "country-map": "СТРАНА → КАРТА",
-        "capital-map": "СТОЛИЦА → КАРТА"
-    };
-
-    return titles[mode];
 }
 
 async function loadMap() {
@@ -340,6 +346,8 @@ function renderMap() {
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
     svg.setAttribute("viewBox", "0 0 1000 700");
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+    svg.setAttribute("role", "img");
+    svg.setAttribute("aria-label", "Интерактивная карта Европы");
 
     state.mapData.features.forEach(feature => {
         const properties = feature.properties || {};
@@ -350,21 +358,28 @@ function renderMap() {
             return;
         }
 
-        createFeaturePaths(feature.geometry).forEach(pathData => {
+        createPaths(feature.geometry).forEach(pathData => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("d", pathData);
             path.classList.add("country");
             path.dataset.code = code;
             path.dataset.name = name;
+            path.setAttribute("tabindex", "0");
             path.addEventListener("click", () => checkMapAnswer(path, code));
+            path.addEventListener("keydown", event => {
+                if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    checkMapAnswer(path, code);
+                }
+            });
             svg.appendChild(path);
         });
     });
 
-    elements.map.replaceChildren(svg);
+    ui.map.replaceChildren(svg);
 }
 
-function createFeaturePaths(geometry) {
+function createPaths(geometry) {
     const convertRing = ring => ring
         .map(([longitude, latitude], index) => {
             const x = ((longitude + 180) / 360) * 1000;
@@ -378,9 +393,7 @@ function createFeaturePaths(geometry) {
     }
 
     if (geometry.type === "MultiPolygon") {
-        return geometry.coordinates.flatMap(polygon =>
-            [polygon.map(convertRing).join(" ")]
-        );
+        return geometry.coordinates.map(polygon => polygon.map(convertRing).join(" "));
     }
 
     return [];
@@ -403,20 +416,14 @@ function normalize(value) {
         .replace(/[^a-z0-9а-яё]/gi, "");
 }
 
-function renderMapTarget(mode) {
+function paintMapTarget() {
     document.querySelectorAll(".country").forEach(path => {
         path.classList.remove("target", "correct", "wrong");
     });
 
-    if (mode === "map-country") {
+    if (state.currentMapMode === "map-country") {
         return;
     }
-
-    document.querySelectorAll(".country").forEach(path => {
-        if (path.dataset.code === state.current[2]) {
-            path.classList.add("target");
-        }
-    });
 }
 
 function checkMapAnswer(path, code) {
@@ -426,21 +433,21 @@ function checkMapAnswer(path, code) {
 
     state.answered = true;
 
-    const isCorrect = code === state.current[2];
+    const correct = code === state.current[2];
 
-    path.classList.add(isCorrect ? "correct" : "wrong");
+    path.classList.add(correct ? "correct" : "wrong");
 
-    if (isCorrect) {
+    if (correct) {
         registerCorrect();
-        elements.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
+        ui.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
     } else {
         registerWrong();
-        elements.feedback.textContent = `✗ Это ${getCountryName(code)}. Ищи: ${state.current[0]}.`;
         document.querySelectorAll(".country").forEach(item => {
             if (item.dataset.code === state.current[2]) {
                 item.classList.add("target");
             }
         });
+        ui.feedback.textContent = `✗ Это ${getCountryName(code)}. Нужна страна: ${state.current[0]}.`;
     }
 
     finishAnswer();
@@ -463,42 +470,55 @@ function registerWrong() {
 }
 
 function finishAnswer() {
-    elements.headerScore.textContent = state.score;
-    elements.headerStreak.textContent = state.streak;
-    elements.accuracy.textContent = `${getAccuracy()}%`;
-    elements.next.classList.remove("hidden");
+    updateHeader();
+    ui.accuracy.textContent = `Точность ${getAccuracy()}%`;
+    ui.next.classList.remove("hidden");
 }
 
 function getAccuracy() {
     const answered = state.index;
-    return answered === 0 ? 0 : Math.round((state.correct / answered) * 100);
+
+    if (answered === 0) {
+        return 0;
+    }
+
+    return Math.round((state.correct / answered) * 100);
+}
+
+function updateHeader() {
+    ui.topScore.textContent = state.score;
+    ui.topStreak.textContent = state.streak;
 }
 
 function finishQuiz() {
     const accuracy = Math.round((state.correct / state.pool.length) * 100);
 
-    elements.quiz.classList.add("hidden");
-    elements.result.classList.remove("hidden");
+    ui.quiz.classList.add("hidden");
+    ui.result.classList.remove("hidden");
 
-    elements.resultScore.textContent = state.score;
-    elements.resultCorrect.textContent = state.correct;
-    elements.resultTotal.textContent = state.pool.length;
-    elements.resultAccuracy.textContent = `${accuracy}%`;
-    elements.resultBestStreak.textContent = state.bestStreak;
+    ui.resultScore.textContent = state.score;
+    ui.resultCorrect.textContent = state.correct;
+    ui.resultTotal.textContent = state.pool.length;
+    ui.resultAccuracy.textContent = `${accuracy}%`;
+    ui.resultBestStreak.textContent = state.bestStreak;
 
     if (accuracy >= 90) {
-        elements.resultTitle.textContent = "Превосходный результат!";
+        ui.resultTitle.textContent = "Превосходный результат!";
     } else if (accuracy >= 70) {
-        elements.resultTitle.textContent = "Очень хороший результат!";
+        ui.resultTitle.textContent = "Очень хороший результат!";
     } else if (accuracy >= 50) {
-        elements.resultTitle.textContent = "Неплохо, но есть что повторить.";
+        ui.resultTitle.textContent = "Хороший старт!";
     } else {
-        elements.resultTitle.textContent = "Пора ещё раз пройтись по карте.";
+        ui.resultTitle.textContent = "Есть что повторить.";
     }
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function showHome() {
-    elements.quiz.classList.add("hidden");
-    elements.result.classList.add("hidden");
-    elements.home.classList.remove("hidden");
+    ui.quiz.classList.add("hidden");
+    ui.result.classList.add("hidden");
+    ui.home.classList.remove("hidden");
+    updateHeader();
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
