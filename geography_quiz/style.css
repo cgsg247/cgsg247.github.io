@@ -442,6 +442,20 @@ select {
     text-align: center;
 }
 
+.question-flag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 54px;
+    margin: 10px auto 2px;
+    font-size: 42px;
+    line-height: 1;
+}
+
+.question-flag.hidden {
+    display: none;
+}
+
 .question {
     max-width: 850px;
     margin: 17px auto 28px;
@@ -544,7 +558,7 @@ select {
 }
 
 #mapContainer {
-    min-height: 430px;
+    min-height: 0;
     overflow: hidden;
     border: 1px solid #dfe5ee;
     border-radius: 16px;
@@ -557,8 +571,11 @@ select {
 #mapContainer svg {
     display: block;
     width: 100%;
-    min-height: 430px;
     height: auto;
+    aspect-ratio: 5 / 3;
+    min-height: 0;
+    max-height: 620px;
+    touch-action: manipulation;
 }
 
 .country {
@@ -842,7 +859,21 @@ footer {
         border-radius: 18px;
     }
 
-    .question {
+    .question-flag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 54px;
+    margin: 10px auto 2px;
+    font-size: 42px;
+    line-height: 1;
+}
+
+.question-flag.hidden {
+    display: none;
+}
+
+.question {
         font-size: 29px;
     }
 
@@ -860,7 +891,7 @@ footer {
 
     #mapContainer,
     #mapContainer svg {
-        min-height: 310px;
+        min-height: 0;
     }
 
     .result {

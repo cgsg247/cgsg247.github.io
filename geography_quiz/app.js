@@ -112,6 +112,7 @@ const ui = {
     progressBar: $("progressBar"),
     questionMode: $("questionMode"),
     question: $("questionText"),
+    questionFlag: $("questionFlag"),
     answers: $("answerArea"),
     feedback: $("feedback"),
     mapCard: $("mapCard"),
@@ -197,6 +198,28 @@ function startQuiz() {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function countryFlag(country) {
+    const code = country[2];
+
+    return code
+        .toUpperCase()
+        .split("")
+        .map(letter => String.fromCodePoint(127397 + letter.charCodeAt(0)))
+        .join("");
+}
+
+function setQuestionFlag(country) {
+    ui.questionFlag.textContent = countryFlag(country);
+    ui.questionFlag.classList.remove("hidden");
+    ui.questionFlag.setAttribute("aria-label", `Флаг: ${country[0]}`);
+}
+
+function clearQuestionFlag() {
+    ui.questionFlag.textContent = "";
+    ui.questionFlag.classList.add("hidden");
+    ui.questionFlag.removeAttribute("aria-label");
+}
+
 function renderQuestion() {
     if (state.index >= state.pool.length) {
         finishQuiz();
@@ -205,6 +228,7 @@ function renderQuestion() {
 
     state.current = state.pool[state.index];
     state.answered = false;
+    clearQuestionFlag();
 
     const mode = state.mode === "mixed"
         ? shuffle(["country-capital", "capital-country", "map-country", "country-map", "capital-map"])[0]
@@ -234,6 +258,7 @@ function isMapMode(mode) {
 
 function renderChoiceQuestion(mode) {
     const countryToCapital = mode === "country-capital";
+    setQuestionFlag(state.current);
     const correct = countryToCapital ? state.current[1] : state.current[0];
 
     ui.questionMode.textContent = countryToCapital
@@ -298,6 +323,7 @@ function checkChoice(button, answer, correct) {
 
 async function renderMapQuestion(mode) {
     ui.mapCard.classList.remove("hidden");
+    setQuestionFlag(state.current);
     ui.questionMode.textContent = {
         "map-country": "НАЙДИ СТРАНУ",
         "country-map": "СТРАНА → КАРТА",
@@ -343,28 +369,48 @@ async function loadMap() {
 }
 
 function renderMap() {
+    const features = state.mapData.features
+        .map(feature => ({
+            feature,
+            code: getMapCode(
+                feature.properties?.NAME ||
+                feature.properties?.name ||
+                feature.properties?.ADMIN ||
+                ""
+            )
+        }))
+        .filter(item => item.code);
+
+    const bounds = getFeatureBounds(features.map(item => item.feature.geometry));
+    const viewWidth = 1000;
+    const viewHeight = 600;
+    const padding = 34;
+    const availableWidth = viewWidth - padding * 2;
+    const availableHeight = viewHeight - padding * 2;
+    const dataWidth = Math.max(bounds.maxLon - bounds.minLon, 1);
+    const dataHeight = Math.max(bounds.maxLat - bounds.minLat, 1);
+    const scale = Math.min(availableWidth / dataWidth, availableHeight / dataHeight);
+    const offsetX = (viewWidth - dataWidth * scale) / 2;
+    const offsetY = (viewHeight - dataHeight * scale) / 2;
+
     const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 1000 700");
+    svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
     svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
     svg.setAttribute("role", "img");
     svg.setAttribute("aria-label", "Интерактивная карта Европы");
 
-    state.mapData.features.forEach(feature => {
-        const properties = feature.properties || {};
-        const name = properties.NAME || properties.name || properties.ADMIN || "";
-        const code = getMapCode(name);
-
-        if (!code) {
-            return;
-        }
-
-        createPaths(feature.geometry).forEach(pathData => {
+    features.forEach(({ feature, code }) => {
+        createPaths(feature.geometry, point => {
+            const x = offsetX + (point[0] - bounds.minLon) * scale;
+            const y = viewHeight - offsetY - (point[1] - bounds.minLat) * scale;
+            return [x, y];
+        }).forEach(pathData => {
             const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
             path.setAttribute("d", pathData);
             path.classList.add("country");
             path.dataset.code = code;
-            path.dataset.name = name;
             path.setAttribute("tabindex", "0");
+            path.setAttribute("aria-label", getCountryName(code));
             path.addEventListener("click", () => checkMapAnswer(path, code));
             path.addEventListener("keydown", event => {
                 if (event.key === "Enter" || event.key === " ") {
@@ -379,11 +425,43 @@ function renderMap() {
     ui.map.replaceChildren(svg);
 }
 
-function createPaths(geometry) {
+function getFeatureBounds(geometries) {
+    const bounds = {
+        minLon: Infinity,
+        maxLon: -Infinity,
+        minLat: Infinity,
+        maxLat: -Infinity
+    };
+
+    geometries.forEach(geometry => {
+        walkCoordinates(geometry.coordinates, point => {
+            bounds.minLon = Math.min(bounds.minLon, point[0]);
+            bounds.maxLon = Math.max(bounds.maxLon, point[0]);
+            bounds.minLat = Math.min(bounds.minLat, point[1]);
+            bounds.maxLat = Math.max(bounds.maxLat, point[1]);
+        });
+    });
+
+    return bounds;
+}
+
+function walkCoordinates(value, callback) {
+    if (!Array.isArray(value)) {
+        return;
+    }
+
+    if (value.length >= 2 && typeof value[0] === "number" && typeof value[1] === "number") {
+        callback(value);
+        return;
+    }
+
+    value.forEach(item => walkCoordinates(item, callback));
+}
+
+function createPaths(geometry, project) {
     const convertRing = ring => ring
-        .map(([longitude, latitude], index) => {
-            const x = ((longitude + 180) / 360) * 1000;
-            const y = ((90 - latitude) / 180) * 700;
+        .map((point, index) => {
+            const [x, y] = project(point);
             return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
         })
         .join(" ") + " Z";
@@ -413,6 +491,8 @@ function getMapCode(name) {
 function normalize(value) {
     return value
         .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\\u0300-\\u036f]/g, "")
         .replace(/[^a-z0-9а-яё]/gi, "");
 }
 
