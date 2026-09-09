@@ -121,80 +121,88 @@ const state = {
   globeActive: false,
 };
 
+// ======================
+// 3. УТИЛИТЫ И UI
+// ======================
 const $ = (id) => document.getElementById(id);
 
+const ui = {
+  home: $("homeScreen"),
+  quiz: $("quizScreen"),
+  result: $("resultScreen"),
+  modeCards: document.querySelectorAll(".mode-card"),
+  difficulty: $("difficulty"),
+  count: $("questionCount"),
+  start: $("startButton"),
+  back: $("backButton"),
+  restart: $("restartButton"),
+  again: $("againButton"),
+  homeButton: $("homeButton"),
+  next: $("nextButton"),
+  progress: $("progressText"),
+  accuracy: $("accuracyText"),
+  progressBar: $("progressBar"),
+  questionMode: $("questionMode"),
+  question: $("questionText"),
+  questionFlag: $("questionFlag"),
+  answers: $("answerArea"),
+  feedback: $("feedback"),
+  mapCard: $("mapCard"),
+  mapInstruction: $("mapInstruction"),
+  map: $("mapContainer"),
+  topScore: $("topScore"),
+  topStreak: $("topStreak"),
+  resultTitle: $("resultTitle"),
+  resultScore: $("resultScore"),
+  resultCorrect: $("resultCorrect"),
+  resultTotal: $("resultTotal"),
+  resultAccuracy: $("resultAccuracy"),
+  resultBestStreak: $("resultBestStreak"),
+  globeBtn: $("globeToggle") || $("openGlobe"),
+};
+
 // ======================
-// 3. ИНИЦИАЛИЗАЦИЯ (Безопасная)
+// 4. ИНИЦИАЛИЗАЦИЯ (Безопасная)
 // ======================
 document.addEventListener("DOMContentLoaded", () => {
-  const ui = {
-    home: $("homeScreen"),
-    quiz: $("quizScreen"),
-    result: $("resultScreen"),
-    modeCards: document.querySelectorAll(".mode-card"),
-    difficulty: $("difficulty"),
-    count: $("questionCount"),
-    start: $("startButton"),
-    back: $("backButton"),
-    again: $("againButton"),
-    homeButton: $("homeButton"),
-    next: $("nextButton"),
-    progress: $("progressText"),
-    accuracy: $("accuracyText"),
-    progressBar: $("progressBar"),
-    questionMode: $("questionMode"),
-    question: $("questionText"),
-    questionFlag: $("questionFlag"),
-    answers: $("answerArea"),
-    feedback: $("feedback"),
-    mapCard: $("mapCard"),
-    mapInstruction: $("mapInstruction"),
-    map: $("mapContainer"),
-    topScore: $("topScore"),
-    topStreak: $("topStreak"),
-    resultTitle: $("resultTitle"),
-    resultScore: $("resultScore"),
-    resultCorrect: $("resultCorrect"),
-    resultTotal: $("resultTotal"),
-    resultAccuracy: $("resultAccuracy"),
-    resultBestStreak: $("resultBestStreak"),
-    globeBtn: $("globeToggle") || $("openGlobe"),
-  };
-
-  // Безопасная привязка событий (если элемента нет, ошибки не будет)
-  const bind = (el, event, fn) => el && el.addEventListener(event, fn);
-
-  ui.modeCards.forEach((card) => {
-    bind(card, "click", () => {
-      ui.modeCards.forEach((item) => item.classList.remove("active"));
-      card.classList.add("active");
-      state.mode = card.dataset.mode;
+  if (ui.modeCards) {
+    ui.modeCards.forEach((card) => {
+      card.addEventListener("click", () => {
+        ui.modeCards.forEach((item) => item.classList.remove("active"));
+        card.classList.add("active");
+        state.mode = card.dataset.mode;
+      });
     });
-  });
+  }
 
-  bind(ui.start, "click", startQuiz);
-  bind(ui.again, "click", startQuiz);
-  bind(ui.back, "click", showHome);
-  bind(ui.homeButton, "click", showHome);
+  if (ui.start) ui.start.addEventListener("click", startQuiz);
+  if (ui.restart) ui.restart.addEventListener("click", startQuiz);
+  if (ui.again) ui.again.addEventListener("click", startQuiz);
+  if (ui.back) ui.back.addEventListener("click", showHome);
+  if (ui.homeButton) ui.homeButton.addEventListener("click", showHome);
 
   const logoBtn = $("logoButton");
-  bind(logoBtn, "click", (e) => {
-    e.preventDefault();
-    showHome();
-  });
+  if (logoBtn) {
+    logoBtn.addEventListener("click", (event) => {
+      event.preventDefault();
+      showHome();
+    });
+  }
 
-  bind(ui.next, "click", () => {
-    state.index += 1;
-    renderQuestion();
-  });
-  bind(ui.globeBtn, "click", openGlobe);
+  if (ui.next) {
+    ui.next.addEventListener("click", () => {
+      state.index += 1;
+      renderQuestion();
+    });
+  }
 
-  updateHeader(ui);
-  window.appUI = ui; // Делаем UI доступным для других функций
+  if (ui.globeBtn) {
+    ui.globeBtn.addEventListener("click", openGlobe);
+  }
 });
 
 // ======================
-// 4. ЛОГИКА ВИКТОРИНЫ
+// 5. ЛОГИКА ВИКТОРИНЫ
 // ======================
 function shuffle(items) {
   const result = [...items];
@@ -206,61 +214,63 @@ function shuffle(items) {
 }
 
 function getAvailableCountries() {
-  const difficulty = window.appUI?.difficulty?.value || "all";
-  if (difficulty === "standard")
-    return countries.filter((c) => majorCodes.has(c[2]));
-  if (difficulty === "hard")
-    return countries.filter((c) => !majorCodes.has(c[2]));
+  const difficulty = ui.difficulty ? ui.difficulty.value : "all";
+  if (difficulty === "standard") {
+    return countries.filter((country) => majorCodes.has(country[2]));
+  }
+  if (difficulty === "hard") {
+    return countries.filter((country) => !majorCodes.has(country[2]));
+  }
   return countries;
 }
 
 function startQuiz() {
-  const ui = window.appUI;
   const available = getAvailableCountries();
   const amount =
     ui.count.value === "all" ? available.length : Number(ui.count.value);
 
-  Object.assign(state, {
-    pool: shuffle(available).slice(0, Math.min(amount, available.length)),
-    index: 0,
-    current: null,
-    currentMapMode: null,
-    score: 0,
-    streak: 0,
-    bestStreak: 0,
-    correct: 0,
-  });
+  state.pool = shuffle(available).slice(0, Math.min(amount, available.length));
+  state.index = 0;
+  state.current = null;
+  state.currentMapMode = null;
+  state.score = 0;
+  state.streak = 0;
+  state.bestStreak = 0;
+  state.correct = 0;
 
-  updateHeader(ui);
-  ui.home.classList.add("hidden");
-  ui.result.classList.add("hidden");
-  ui.quiz.classList.remove("hidden");
+  updateHeader();
+  if (ui.home) ui.home.classList.add("hidden");
+  if (ui.result) ui.result.classList.add("hidden");
+  if (ui.quiz) ui.quiz.classList.remove("hidden");
+
   renderQuestion();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function countryFlag(country) {
-  return country[2]
+  const code = country[2];
+  return code
     .toUpperCase()
     .split("")
-    .map((l) => String.fromCodePoint(127397 + l.charCodeAt(0)))
+    .map((letter) => String.fromCodePoint(127397 + letter.charCodeAt(0)))
     .join("");
 }
 
-function setQuestionFlag(country, ui) {
+function setQuestionFlag(country) {
+  if (!ui.questionFlag) return;
   ui.questionFlag.textContent = countryFlag(country);
   ui.questionFlag.classList.remove("hidden");
   ui.questionFlag.setAttribute("aria-label", `Флаг: ${country[0]}`);
 }
 
-function clearQuestionFlag(ui) {
+function clearQuestionFlag() {
+  if (!ui.questionFlag) return;
   ui.questionFlag.textContent = "";
   ui.questionFlag.classList.add("hidden");
   ui.questionFlag.removeAttribute("aria-label");
 }
 
 function renderQuestion() {
-  const ui = window.appUI;
   if (state.index >= state.pool.length) {
     finishQuiz();
     return;
@@ -268,7 +278,7 @@ function renderQuestion() {
 
   state.current = state.pool[state.index];
   state.answered = false;
-  clearQuestionFlag(ui);
+  clearQuestionFlag();
 
   const mode =
     state.mode === "mixed"
@@ -282,108 +292,130 @@ function renderQuestion() {
       : state.mode;
   state.currentMapMode = mode;
 
-  ui.progress.textContent = `${state.index + 1} / ${state.pool.length}`;
-  ui.progressBar.style.width = `${((state.index + 1) / state.pool.length) * 100}%`;
-  ui.accuracy.textContent = `Точность ${getAccuracy()}%`;
-  ui.feedback.textContent = "";
-  ui.next.classList.add("hidden");
-  ui.answers.replaceChildren();
-  ui.mapCard.classList.add("hidden");
+  if (ui.progress)
+    ui.progress.textContent = `${state.index + 1} / ${state.pool.length}`;
+  if (ui.progressBar)
+    ui.progressBar.style.width = `${((state.index + 1) / state.pool.length) * 100}%`;
+  if (ui.accuracy) ui.accuracy.textContent = `Точность ${getAccuracy()}%`;
+  if (ui.feedback) ui.feedback.textContent = "";
+  if (ui.next) ui.next.classList.add("hidden");
+  if (ui.answers) ui.answers.replaceChildren();
+  if (ui.mapCard) ui.mapCard.classList.add("hidden");
 
-  if (isMapMode(mode)) renderMapQuestion(mode);
-  else renderChoiceQuestion(mode);
+  if (isMapMode(mode)) {
+    renderMapQuestion(mode);
+    return;
+  }
+  renderChoiceQuestion(mode);
 }
 
 function isMapMode(mode) {
-  return ["map-country", "country-map", "capital-map"].includes(mode);
+  return (
+    mode === "map-country" || mode === "country-map" || mode === "capital-map"
+  );
 }
 
 function renderChoiceQuestion(mode) {
-  const ui = window.appUI;
   const countryToCapital = mode === "country-capital";
-  setQuestionFlag(state.current, ui);
+  setQuestionFlag(state.current);
 
   const correct = countryToCapital ? state.current[1] : state.current[0];
-  ui.questionMode.textContent = countryToCapital
-    ? "СТРАНА → СТОЛИЦА"
-    : "СТОЛИЦА → СТРАНА";
-  ui.question.innerHTML = countryToCapital
-    ? `Какая столица у страны <strong>${state.current[0]}</strong>?`
-    : `К какой стране относится столица <strong>${state.current[1]}</strong>?`;
+  if (ui.questionMode) {
+    ui.questionMode.textContent = countryToCapital
+      ? "СТРАНА → СТОЛИЦА"
+      : "СТОЛИЦА → СТРАНА";
+  }
+  if (ui.question) {
+    ui.question.innerHTML = countryToCapital
+      ? `Какая столица у страны <strong>${state.current[0]}</strong>?`
+      : `К какой стране относится столица <strong>${state.current[1]}</strong>?`;
+  }
 
   const alternatives = countryToCapital
-    ? countries.map((c) => c[1])
-    : countries.map((c) => c[0]);
+    ? countries.map((country) => country[1])
+    : countries.map((country) => country[0]);
   const options = shuffle([
     correct,
-    ...shuffle(alternatives.filter((v) => v !== correct)).slice(0, 3),
+    ...shuffle(alternatives.filter((value) => value !== correct)).slice(0, 3),
   ]);
 
   const wrapper = document.createElement("div");
   wrapper.className = "answers";
   options.forEach((option) => {
-    const btn = document.createElement("button");
-    btn.className = "answer-button";
-    btn.type = "button";
-    btn.textContent = option;
-    btn.addEventListener("click", () => checkChoice(btn, option, correct));
-    wrapper.appendChild(btn);
+    const button = document.createElement("button");
+    button.className = "answer-button";
+    button.type = "button";
+    button.textContent = option;
+    button.addEventListener("click", () =>
+      checkChoice(button, option, correct),
+    );
+    wrapper.appendChild(button);
   });
-  ui.answers.appendChild(wrapper);
+  if (ui.answers) ui.answers.appendChild(wrapper);
 }
 
 function checkChoice(button, answer, correct) {
   if (state.answered) return;
   state.answered = true;
-  document
-    .querySelectorAll(".answer-button")
-    .forEach((b) => (b.disabled = true));
+
+  document.querySelectorAll(".answer-button").forEach((item) => {
+    item.disabled = true;
+  });
 
   if (answer === correct) {
     button.classList.add("correct");
     registerCorrect();
-    window.appUI.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
+    if (ui.feedback)
+      ui.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
   } else {
     button.classList.add("wrong");
-    document.querySelectorAll(".answer-button").forEach((b) => {
-      if (b.textContent === correct) b.classList.add("correct");
+    document.querySelectorAll(".answer-button").forEach((item) => {
+      if (item.textContent === correct) {
+        item.classList.add("correct");
+      }
     });
     registerWrong();
-    window.appUI.feedback.textContent = `✗ Правильный ответ: ${correct}.`;
+    if (ui.feedback)
+      ui.feedback.textContent = `✗ Правильный ответ: ${correct}.`;
   }
   finishAnswer();
 }
 
 // ======================
-// 5. ЛОГИКА КАРТЫ
+// 6. ЛОГИКА КАРТЫ
 // ======================
 async function renderMapQuestion(mode) {
-  const ui = window.appUI;
-  ui.mapCard.classList.remove("hidden");
-  setQuestionFlag(state.current, ui);
+  if (ui.mapCard) ui.mapCard.classList.remove("hidden");
+  setQuestionFlag(state.current);
 
-  const titles = {
-    "map-country": "НАЙДИ СТРАНУ",
-    "country-map": "СТРАНА → КАРТА",
-    "capital-map": "СТОЛИЦА → КАРТА",
-  };
-  ui.questionMode.textContent = titles[mode];
+  if (ui.questionMode) {
+    ui.questionMode.textContent = {
+      "map-country": "НАЙДИ СТРАНУ",
+      "country-map": "СТРАНА → КАРТА",
+      "capital-map": "СТОЛИЦА → КАРТА",
+    }[mode];
+  }
 
-  if (mode === "map-country")
-    ui.question.innerHTML = `Найди на карте <strong>${state.current[0]}</strong>`;
-  else if (mode === "country-map")
-    ui.question.innerHTML = `Где находится <strong>${state.current[0]}</strong>?`;
-  else
-    ui.question.innerHTML = `Где находится страна со столицей <strong>${state.current[1]}</strong>?`;
+  if (ui.question) {
+    if (mode === "map-country") {
+      ui.question.innerHTML = `Найди на карте <strong>${state.current[0]}</strong>`;
+    } else if (mode === "country-map") {
+      ui.question.innerHTML = `Где находится <strong>${state.current[0]}</strong>?`;
+    } else {
+      ui.question.innerHTML = `Где находится страна со столицей <strong>${state.current[1]}</strong>?`;
+    }
+  }
 
-  ui.mapInstruction.textContent = "Нажми на нужную страну";
+  if (ui.mapInstruction)
+    ui.mapInstruction.textContent = "Нажми на нужную страну";
 
   try {
     await loadMap();
     paintMapTarget();
-  } catch (e) {
-    console.error(e);
-    ui.map.innerHTML = `<div class="map-error">Карта не загрузилась. Проверь интернет и обнови страницу.</div>`;
+  } catch {
+    if (ui.map) {
+      ui.map.innerHTML = `<div class="map-error">Карта не загрузилась. Проверь интернет-соединение и обнови страницу.</div>`;
+    }
   }
 }
 
@@ -393,137 +425,182 @@ async function loadMap() {
     return;
   }
   const response = await fetch(mapUrl);
-  if (!response.ok) throw new Error("Map request failed");
+  if (!response.ok) {
+    throw new Error("Map request failed");
+  }
   state.mapData = await response.json();
   renderMap();
 }
 
 function renderMap() {
-  const ui = window.appUI;
   const features = state.mapData.features
-    .map((f) => ({
-      feature: f,
+    .map((feature) => ({
+      feature,
       code: getMapCode(
-        f.properties?.NAME || f.properties?.name || f.properties?.ADMIN || "",
+        feature.properties?.NAME ||
+          feature.properties?.name ||
+          feature.properties?.ADMIN ||
+          "",
       ),
     }))
     .filter((item) => item.code);
 
-  const bounds = getFeatureBounds(features.map((i) => i.feature.geometry));
-  const vw = 1000,
-    vh = 600,
-    pad = 34;
-  const dw = Math.max(bounds.maxLon - bounds.minLon, 1);
-  const dh = Math.max(bounds.maxLat - bounds.minLat, 1);
-  const scale = Math.min((vw - pad * 2) / dw, (vh - pad * 2) / dh);
-  const ox = (vw - dw * scale) / 2,
-    oy = (vh - dh * scale) / 2;
+  const bounds = getFeatureBounds(
+    features.map((item) => item.feature.geometry),
+  );
+  const viewWidth = 1000;
+  const viewHeight = 600;
+  const padding = 34;
+  const availableWidth = viewWidth - padding * 2;
+  const availableHeight = viewHeight - padding * 2;
+  const dataWidth = Math.max(bounds.maxLon - bounds.minLon, 1);
+  const dataHeight = Math.max(bounds.maxLat - bounds.minLat, 1);
+  const scale = Math.min(
+    availableWidth / dataWidth,
+    availableHeight / dataHeight,
+  );
+  const offsetX = (viewWidth - dataWidth * scale) / 2;
+  const offsetY = (viewHeight - dataHeight * scale) / 2;
 
   const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-  svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+  svg.setAttribute("viewBox", `0 0 ${viewWidth} ${viewHeight}`);
   svg.setAttribute("preserveAspectRatio", "xMidYMid meet");
+  svg.setAttribute("role", "img");
+  svg.setAttribute("aria-label", "Интерактивная карта Европы");
 
   features.forEach(({ feature, code }) => {
-    createPaths(feature.geometry, (p) => [
-      ox + (p[0] - bounds.minLon) * scale,
-      vh - oy - (p[1] - bounds.minLat) * scale,
-    ]).forEach((d) => {
+    createPaths(feature.geometry, (point) => {
+      const x = offsetX + (point[0] - bounds.minLon) * scale;
+      const y = viewHeight - offsetY - (point[1] - bounds.minLat) * scale;
+      return [x, y];
+    }).forEach((pathData) => {
       const path = document.createElementNS(
         "http://www.w3.org/2000/svg",
         "path",
       );
-      path.setAttribute("d", d);
+      path.setAttribute("d", pathData);
       path.classList.add("country");
       path.dataset.code = code;
+      path.setAttribute("tabindex", "0");
+      path.setAttribute("aria-label", getCountryName(code));
       path.addEventListener("click", () => checkMapAnswer(path, code));
+      path.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          checkMapAnswer(path, code);
+        }
+      });
       svg.appendChild(path);
     });
   });
-  ui.map.replaceChildren(svg);
+
+  if (ui.map) ui.map.replaceChildren(svg);
 }
 
-function getFeatureBounds(geoms) {
-  const b = {
+function getFeatureBounds(geometries) {
+  const bounds = {
     minLon: Infinity,
     maxLon: -Infinity,
     minLat: Infinity,
     maxLat: -Infinity,
   };
-  const walk = (v) => {
-    if (!Array.isArray(v)) return;
-    if (v.length >= 2 && typeof v[0] === "number") {
-      b.minLon = Math.min(b.minLon, v[0]);
-      b.maxLon = Math.max(b.maxLon, v[0]);
-      b.minLat = Math.min(b.minLat, v[1]);
-      b.maxLat = Math.max(b.maxLat, v[1]);
-      return;
-    }
-    v.forEach(walk);
-  };
-  geoms.forEach(walk);
-  return b;
+  geometries.forEach((geometry) => {
+    walkCoordinates(geometry.coordinates, (point) => {
+      bounds.minLon = Math.min(bounds.minLon, point[0]);
+      bounds.maxLon = Math.max(bounds.maxLon, point[0]);
+      bounds.minLat = Math.min(bounds.minLat, point[1]);
+      bounds.maxLat = Math.max(bounds.maxLat, point[1]);
+    });
+  });
+  return bounds;
 }
 
-function createPaths(geom, proj) {
-  const ring = (r) =>
-    r
-      .map(
-        (p, i) =>
-          `${i === 0 ? "M" : "L"}${proj(p)[0].toFixed(2)} ${proj(p)[1].toFixed(2)}`,
-      )
+function walkCoordinates(value, callback) {
+  if (!Array.isArray(value)) return;
+  if (
+    value.length >= 2 &&
+    typeof value[0] === "number" &&
+    typeof value[1] === "number"
+  ) {
+    callback(value);
+    return;
+  }
+  value.forEach((item) => walkCoordinates(item, callback));
+}
+
+function createPaths(geometry, project) {
+  const convertRing = (ring) =>
+    ring
+      .map((point, index) => {
+        const [x, y] = project(point);
+        return `${index === 0 ? "M" : "L"}${x.toFixed(2)} ${y.toFixed(2)}`;
+      })
       .join(" ") + " Z";
-  if (geom.type === "Polygon") return [geom.coordinates.map(ring).join(" ")];
-  if (geom.type === "MultiPolygon")
-    return geom.coordinates.map((p) => p.map(ring).join(" "));
+
+  if (geometry.type === "Polygon") {
+    return [geometry.coordinates.map(convertRing).join(" ")];
+  }
+  if (geometry.type === "MultiPolygon") {
+    return geometry.coordinates.map((polygon) =>
+      polygon.map(convertRing).join(" "),
+    );
+  }
   return [];
 }
 
 function getMapCode(name) {
   if (mapAliases[name]) return mapAliases[name];
-  const norm = name
+  const normalized = normalize(name);
+  const country = countries.find((item) => normalize(item[3]) === normalized);
+  return country ? country[2] : null;
+}
+
+function normalize(value) {
+  return value
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9а-яё]/gi, "");
-  const c = countries.find(
-    (x) =>
-      x[3]
-        .toLowerCase()
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .replace(/[^a-z0-9а-яё]/gi, "") === norm,
-  );
-  return c ? c[2] : null;
 }
 
 function paintMapTarget() {
-  document
-    .querySelectorAll(".country")
-    .forEach((p) => p.classList.remove("target", "correct", "wrong"));
+  document.querySelectorAll(".country").forEach((path) => {
+    path.classList.remove("target", "correct", "wrong");
+  });
+  if (state.currentMapMode === "map-country") return;
 }
 
 function checkMapAnswer(path, code) {
   if (state.answered) return;
   state.answered = true;
+
   const correct = code === state.current[2];
   path.classList.add(correct ? "correct" : "wrong");
 
   if (correct) {
     registerCorrect();
-    window.appUI.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
+    if (ui.feedback)
+      ui.feedback.textContent = `✓ Правильно! ${state.current[0]} — ${state.current[1]}.`;
   } else {
     registerWrong();
-    document.querySelectorAll(".country").forEach((p) => {
-      if (p.dataset.code === state.current[2]) p.classList.add("target");
+    document.querySelectorAll(".country").forEach((item) => {
+      if (item.dataset.code === state.current[2]) {
+        item.classList.add("target");
+      }
     });
-    const cName = countries.find((x) => x[2] === code)?.[0] || "другая страна";
-    window.appUI.feedback.textContent = `✗ Это ${cName}. Нужна страна: ${state.current[0]}.`;
+    if (ui.feedback)
+      ui.feedback.textContent = `✗ Это ${getCountryName(code)}. Нужна страна: ${state.current[0]}.`;
   }
   finishAnswer();
 }
 
+function getCountryName(code) {
+  const country = countries.find((item) => item[2] === code);
+  return country ? country[0] : "другая страна";
+}
+
 // ======================
-// 6. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
+// 7. ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
 // ======================
 function registerCorrect() {
   state.correct += 1;
@@ -531,66 +608,68 @@ function registerCorrect() {
   state.bestStreak = Math.max(state.bestStreak, state.streak);
   state.score += 10 + Math.min(state.streak - 1, 10) * 2;
 }
+
 function registerWrong() {
   state.streak = 0;
 }
+
 function finishAnswer() {
-  const ui = window.appUI;
-  updateHeader(ui);
-  ui.accuracy.textContent = `Точность ${getAccuracy()}%`;
-  ui.next.classList.remove("hidden");
+  updateHeader();
+  if (ui.accuracy) ui.accuracy.textContent = `Точность ${getAccuracy()}%`;
+  if (ui.next) ui.next.classList.remove("hidden");
 }
+
 function getAccuracy() {
-  const n = state.index;
-  return n === 0 ? 0 : Math.round((state.correct / n) * 100);
+  const answered = state.index;
+  if (answered === 0) return 0;
+  return Math.round((state.correct / answered) * 100);
 }
-function updateHeader(ui) {
+
+function updateHeader() {
   if (ui.topScore) ui.topScore.textContent = state.score;
   if (ui.topStreak) ui.topStreak.textContent = state.streak;
 }
+
 function finishQuiz() {
-  const ui = window.appUI;
-  const acc = Math.round((state.correct / state.pool.length) * 100);
-  ui.quiz.classList.add("hidden");
-  ui.result.classList.remove("hidden");
-  ui.resultScore.textContent = state.score;
-  ui.resultCorrect.textContent = state.correct;
-  ui.resultTotal.textContent = state.pool.length;
-  ui.resultAccuracy.textContent = `${acc}%`;
-  ui.resultBestStreak.textContent = state.bestStreak;
-  ui.resultTitle.textContent =
-    acc >= 90
-      ? "Превосходный результат!"
-      : acc >= 70
-        ? "Очень хороший результат!"
-        : acc >= 50
-          ? "Хороший старт!"
-          : "Есть что повторить.";
+  const accuracy = Math.round((state.correct / state.pool.length) * 100);
+  if (ui.quiz) ui.quiz.classList.add("hidden");
+  if (ui.result) ui.result.classList.remove("hidden");
+
+  if (ui.resultScore) ui.resultScore.textContent = state.score;
+  if (ui.resultCorrect) ui.resultCorrect.textContent = state.correct;
+  if (ui.resultTotal) ui.resultTotal.textContent = state.pool.length;
+  if (ui.resultAccuracy) ui.resultAccuracy.textContent = `${accuracy}%`;
+  if (ui.resultBestStreak) ui.resultBestStreak.textContent = state.bestStreak;
+
+  if (ui.resultTitle) {
+    if (accuracy >= 90) ui.resultTitle.textContent = "Превосходный результат!";
+    else if (accuracy >= 70)
+      ui.resultTitle.textContent = "Очень хороший результат!";
+    else if (accuracy >= 50) ui.resultTitle.textContent = "Хороший старт!";
+    else ui.resultTitle.textContent = "Есть что повторить.";
+  }
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
+
 function showHome() {
-  const ui = window.appUI;
-  ui.quiz.classList.add("hidden");
-  ui.result.classList.add("hidden");
-  ui.home.classList.remove("hidden");
-  updateHeader(ui);
+  if (ui.quiz) ui.quiz.classList.add("hidden");
+  if (ui.result) ui.result.classList.add("hidden");
+  if (ui.home) ui.home.classList.remove("hidden");
+  updateHeader();
   window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 // ======================
-// 7. 3D ГЛОБУС (Безопасная загрузка)
+// 8. 3D ГЛОБУС (ОПТИМИЗИРОВАННЫЙ)
 // ======================
 function openGlobe() {
   if (state.globeActive) return;
   state.globeActive = true;
 
-  // Скрываем остальные экраны
-  const ui = window.appUI;
-  ui.home.classList.add("hidden");
-  ui.quiz.classList.add("hidden");
-  ui.result.classList.add("hidden");
+  if (ui.home) ui.home.classList.add("hidden");
+  if (ui.quiz) ui.quiz.classList.add("hidden");
+  if (ui.result) ui.result.classList.add("hidden");
 
-  // Создаём контейнер для глобуса, если его нет
   let globeScreen = $("globeScreen");
   if (!globeScreen) {
     globeScreen = document.createElement("section");
@@ -608,7 +687,6 @@ function openGlobe() {
     `;
     document.querySelector(".site-shell").appendChild(globeScreen);
 
-    // Привязка кнопки закрытия
     setTimeout(() => {
       const closeBtn = $("closeGlobeBtn");
       if (closeBtn) {
@@ -627,7 +705,6 @@ function openGlobe() {
     globeScreen.classList.remove("hidden");
   }
 
-  // Загружаем Three.js динамически, если его ещё нет
   if (!window.THREE) {
     const script = document.createElement("script");
     script.src =
@@ -644,6 +721,11 @@ function initGlobe() {
   const loader = $("globeLoader");
   if (!container || !window.THREE) return;
 
+  // Принудительно скрываем лоадер через 3 секунды, даже если текстура ещё грузится
+  const loadTimeout = setTimeout(() => {
+    if (loader) loader.style.display = "none";
+  }, 3000);
+
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -656,7 +738,8 @@ function initGlobe() {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
   renderer.setSize(container.clientWidth, container.clientHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.innerHTML = ""; // Очищаем лоадер
+
+  container.innerHTML = "";
   container.appendChild(renderer.domElement);
   window.globeRenderer = renderer;
 
@@ -681,7 +764,7 @@ function initGlobe() {
     ),
   );
 
-  // Земля
+  // Земля (сразу синяя, чтобы не было чёрного экрана)
   const earthGeo = new THREE.SphereGeometry(1, 64, 64);
   const earthMat = new THREE.MeshPhongMaterial({ color: 0x4169e1 });
   const earth = new THREE.Mesh(earthGeo, earthMat);
@@ -693,18 +776,28 @@ function initGlobe() {
   dirLight.position.set(5, 3, 5);
   scene.add(dirLight);
 
-  // Текстура
+  // Загрузка ЛЁГКОЙ текстуры (1024x512, ~300 КБ)
+  const textureUrl =
+    "https://raw.githubusercontent.com/mrdoob/three.js/r128/examples/textures/planets/earth_atmos_1024.jpg";
+
   new THREE.TextureLoader().load(
-    "https://unpkg.com/three-globe@2.41.1/example/img/earth-blue-marble.jpg",
+    textureUrl,
+    // Успех
     (tex) => {
+      clearTimeout(loadTimeout);
+      if (loader) loader.style.display = "none";
       earthMat.map = tex;
       earthMat.color.set(0xffffff);
       earthMat.needsUpdate = true;
     },
+    // Прогресс (игнорируем)
     undefined,
+    // Ошибка
     () => {
-      earthMat.color.set(0x2d8a5e);
-    }, // Fallback цвет, если текстура не загрузилась
+      clearTimeout(loadTimeout);
+      if (loader) loader.style.display = "none";
+      earthMat.color.set(0x2d8a5e); // Зелёный цвет при невозможности загрузить текстуру
+    },
   );
 
   // Управление
@@ -747,7 +840,7 @@ function initGlobe() {
   const animate = () => {
     if (!state.globeActive) return;
     requestAnimationFrame(animate);
-    if (!isDragging) earth.rotation.y += 0.001; // Автовращение
+    if (!isDragging) earth.rotation.y += 0.001; // Плавное автовращение
     camera.position.z += (targetZoom - camera.position.z) * 0.08;
     camera.lookAt(scene.position);
     renderer.render(scene, camera);
